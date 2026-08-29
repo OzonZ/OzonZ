@@ -1,7 +1,20 @@
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
-export default function Hero() {
+/**
+ * Hero — Scene 01
+ * bgProgress (0→1): passed from App, drives white→pink background transition
+ * as user scrolls into the scroll journey section.
+ */
+export default function Hero({ bgProgress = 0 }) {
+  // Interpolate white → #ffebf0 based on scroll
+  // rgb(255,255,255) → rgb(255,235,240)
+  const r = 255;
+  const g = Math.round(255 - bgProgress * 20); // 255 → 235
+  const b = Math.round(255 - bgProgress * 15); // 255 → 240
+  const heroBg = `rgb(${r},${g},${b})`;
+
   return (
     <section
       id="hero"
@@ -12,7 +25,8 @@ export default function Hero() {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        background: '#ffffff',
+        background: heroBg,
+        transition: 'background 0.05s linear',
       }}
     >
       {/* Animated Mesh Gradient Background */}
