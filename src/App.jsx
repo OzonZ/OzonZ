@@ -1,117 +1,85 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './index.css';
 
 import AudioToggle from './components/AudioToggle';
-import Hero from './components/Hero';
 import ScrollJourney from './components/ScrollJourney';
-import BoxReveal from './components/BoxReveal';
-import VoucherGrid from './components/VoucherGrid';
+import TicketShowcaseModal from './components/TicketShowcaseModal';
+import PostCardModal from './components/PostCardModal';
 import FinaleModal from './components/FinaleModal';
 import ToastPill from './components/ToastPill';
 import { logVisit } from './lib/firebase';
+import { sfxChime } from './lib/audio';
 
 export default function App() {
-  // Scene gate states
-  const [showBoxReveal, setShowBoxReveal] = useState(false);
-  const [showVouchers,  setShowVouchers]  = useState(false);
-  const [showToast,     setShowToast]     = useState(false);
-  const [showFinale,    setShowFinale]    = useState(false);
+  // Modal states
+  const [showTicketsModal, setShowTicketsModal] = useState(false);
+  const [showPostcardModal, setShowPostcardModal] = useState(false);
+  const [showFinaleModal, setShowFinaleModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
-  // Hero background progress (0→1 as user scrolls down from hero)
-  const [heroBgProgress, setHeroBgProgress] = useState(0);
-
-  // Ref to ScrollJourney's reset function (called when user scrolls back to top)
-  const scrollJourneyResetRef = useRef(null);
-
-  // ── Visit log ────────────────────────────────────────────────────────────
+  // Log visitor on page load
   useEffect(() => {
     logVisit().catch(() => {});
   }, []);
 
-  // ── Scroll listener: hero bg transition + full reset on scroll-to-top ────
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY  = window.scrollY;
-      const heroH    = window.innerHeight;
-
-      // Hero background color: 0→1 over the first viewport height of scrolling
-      const progress = Math.min(scrollY / heroH, 1);
-      setHeroBgProgress(progress);
-
-      // Reset all scene gates when user scrolls back near the very top
-      if (scrollY < 60) {
-        setShowBoxReveal(false);
-        setShowVouchers(false);
-        setShowToast(false);
-        setShowFinale(false);
-        // Tell ScrollJourney to reset its step counter
-        scrollJourneyResetRef.current?.();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  // When Red Envelope is tapped -> Open Ticket Showcase popup
+  const handleOpenEnvelope = useCallback(() => {
+    setShowTicketsModal(true);
   }, []);
 
-  // ── Scene 02 → 03 trigger ────────────────────────────────────────────────
-  const handleScrollComplete = useCallback(() => {
-    setShowBoxReveal(true);
-    // Scroll down past the journey section so BoxReveal is in view
-    setTimeout(() => {
-      document.getElementById('box-reveal')?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+  // When Postcard is tapped -> Open Postcard popup & switch BGM
+  const handleOpenPostcard = useCallback(() => {
+    setShowPostcardModal(true);
   }, []);
 
-  // ── Scene 03 → 04 trigger ────────────────────────────────────────────────
-  const handleEnvelopeOpen = useCallback(() => {
-    setTimeout(() => setShowVouchers(true), 400);
-    setTimeout(() => {
-      document.getElementById('voucher-grid')?.scrollIntoView({ behavior: 'smooth' });
-    }, 600);
-  }, []);
-
-  // ── Scene 04 → 05 trigger ────────────────────────────────────────────────
-  const handleAllViewed = useCallback(() => {
+  // When all tickets have been viewed/trophy flipped -> trigger teaser and finale
+  const handleAllTicketsViewed = useCallback(() => {
+    setShowTicketsModal(false);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
-    setTimeout(() => setShowFinale(true), 1800);
+    sfxChime();
+
+    setTimeout(() => {
+      setShowToast(false);
+      setShowFinaleModal(true);
+    }, 2200);
   }, []);
 
   return (
-    <>
-      {/* Fixed UI */}
+    <main style={{ minHeight: '100vh', background: '#ffffff', overflowX: 'hidden' }}>
+      {/* Fixed Persistent Audio Toggle (top-left) */}
       <AudioToggle />
+
+      {/* Floating Teaser Toast Notification */}
       <ToastPill
         visible={showToast}
-        text={`"Wait a second... looks like there's one final gift tucked away here! 🎁"`}
+        text={`"Wait a second... looks like there's one final birthday gift tucked away here! 🎂🎉"`}
       />
 
-      {/* Finale modal */}
-      <FinaleModal
-        isOpen={showFinale}
-        onClose={() => setShowFinale(false)}
-      />
-
-      {/* Scene 01 — Hero (receives bg progress for seamless color shift) */}
-      <Hero bgProgress={heroBgProgress} />
-
-      {/* Scene 02 — Scroll Journey (step-based morph, receives reset ref) */}
+      {/* ─── Unified Seamless Scroll Experience (Scene 01 + 02 + 03) ─── */}
       <ScrollJourney
-        onScrollComplete={handleScrollComplete}
-        onReset={scrollJourneyResetRef}
+        onOpenEnvelope={handleOpenEnvelope}
+        onOpenPostcard={handleOpenPostcard}
       />
 
-      {/* Scene 03 — Box Reveal */}
-      {showBoxReveal && (
-        <BoxReveal onEnvelopeOpen={handleEnvelopeOpen} />
-      )}
+      {/* ─── Scene 04: Interactive Ticket Showcase Modal (Pop-up deck) ─── */}
+      <TicketShowcaseModal
+        isOpen={showTicketsModal}
+        onClose={() => setShowTicketsModal(false)}
+        onOpenPostcard={handleOpenPostcard}
+        onAllViewed={handleAllTicketsViewed}
+      />
 
-      {/* Scene 04 — Voucher Grid (click one-by-one) */}
-      {showVouchers && (
-        <VoucherGrid onAllViewed={handleAllViewed} />
-      )}
+      {/* ─── Special Secret Postcard Modal (with BGM Switch & 3D Flip) ──── */}
+      <PostCardModal
+        isOpen={showPostcardModal}
+        onClose={() => setShowPostcardModal(false)}
+      />
 
-      {/* Scene 05 — FinaleModal (portal above) */}
-    </>
+      {/* ─── Scene 05: Multi-Dimensional Birthday Finale Modal ─────────── */}
+      <FinaleModal
+        isOpen={showFinaleModal}
+        onClose={() => setShowFinaleModal(false)}
+      />
+    </main>
   );
 }
