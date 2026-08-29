@@ -122,10 +122,12 @@ body {
   font-family: var(--font-head);
   font-weight: 600;
   color: var(--text-main);
-  font-size: 0.95rem;
-  max-width: 220px;
+  font-size: 0.9rem;
+  max-width: 200px;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
 .speech-bubble.left::after {
