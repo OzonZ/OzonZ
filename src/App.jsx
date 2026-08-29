@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import './index.css';
 
 import AudioToggle from './components/AudioToggle';
@@ -11,37 +11,69 @@ import ToastPill from './components/ToastPill';
 import { logVisit } from './lib/firebase';
 
 export default function App() {
-  // Scene gate states — each unlocks on user action
+  // Scene gate states
   const [showBoxReveal, setShowBoxReveal] = useState(false);
-  const [showVouchers, setShowVouchers]   = useState(false);
-  const [showToast, setShowToast]         = useState(false);
-  const [showFinale, setShowFinale]       = useState(false);
+  const [showVouchers,  setShowVouchers]  = useState(false);
+  const [showToast,     setShowToast]     = useState(false);
+  const [showFinale,    setShowFinale]    = useState(false);
 
-  // Log visit on mount
+  // Hero background progress (0→1 as user scrolls down from hero)
+  const [heroBgProgress, setHeroBgProgress] = useState(0);
+
+  // Ref to ScrollJourney's reset function (called when user scrolls back to top)
+  const scrollJourneyResetRef = useRef(null);
+
+  // ── Visit log ────────────────────────────────────────────────────────────
   useEffect(() => {
-    logVisit().catch(() => {}); // Silent fail
+    logVisit().catch(() => {});
   }, []);
 
-  // Scene 02 → 03 trigger
-  const handleScrollComplete = useCallback(() => {
-    if (!showBoxReveal) setShowBoxReveal(true);
-  }, [showBoxReveal]);
+  // ── Scroll listener: hero bg transition + full reset on scroll-to-top ────
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY  = window.scrollY;
+      const heroH    = window.innerHeight;
 
-  // Scene 03 → 04 trigger (envelope opened)
+      // Hero background color: 0→1 over the first viewport height of scrolling
+      const progress = Math.min(scrollY / heroH, 1);
+      setHeroBgProgress(progress);
+
+      // Reset all scene gates when user scrolls back near the very top
+      if (scrollY < 60) {
+        setShowBoxReveal(false);
+        setShowVouchers(false);
+        setShowToast(false);
+        setShowFinale(false);
+        // Tell ScrollJourney to reset its step counter
+        scrollJourneyResetRef.current?.();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ── Scene 02 → 03 trigger ────────────────────────────────────────────────
+  const handleScrollComplete = useCallback(() => {
+    setShowBoxReveal(true);
+    // Scroll down past the journey section so BoxReveal is in view
+    setTimeout(() => {
+      document.getElementById('box-reveal')?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }, []);
+
+  // ── Scene 03 → 04 trigger ────────────────────────────────────────────────
   const handleEnvelopeOpen = useCallback(() => {
     setTimeout(() => setShowVouchers(true), 400);
-    // Smooth scroll to voucher grid
     setTimeout(() => {
       document.getElementById('voucher-grid')?.scrollIntoView({ behavior: 'smooth' });
     }, 600);
   }, []);
 
-  // Scene 04 → 05 trigger (all cards viewed)
+  // ── Scene 04 → 05 trigger ────────────────────────────────────────────────
   const handleAllViewed = useCallback(() => {
-    // Show toast first
     setShowToast(true);
     setTimeout(() => setShowToast(false), 4000);
-    // Open finale modal after toast
     setTimeout(() => setShowFinale(true), 1800);
   }, []);
 
@@ -60,23 +92,26 @@ export default function App() {
         onClose={() => setShowFinale(false)}
       />
 
-      {/* Scene 01 — Hero */}
-      <Hero />
+      {/* Scene 01 — Hero (receives bg progress for seamless color shift) */}
+      <Hero bgProgress={heroBgProgress} />
 
-      {/* Scene 02 — Scroll Journey */}
-      <ScrollJourney onScrollComplete={handleScrollComplete} />
+      {/* Scene 02 — Scroll Journey (step-based morph, receives reset ref) */}
+      <ScrollJourney
+        onScrollComplete={handleScrollComplete}
+        onReset={scrollJourneyResetRef}
+      />
 
-      {/* Scene 03 — Box Reveal (shown after scroll complete) */}
+      {/* Scene 03 — Box Reveal */}
       {showBoxReveal && (
         <BoxReveal onEnvelopeOpen={handleEnvelopeOpen} />
       )}
 
-      {/* Scene 04 — Voucher Grid (shown after envelope opened) */}
+      {/* Scene 04 — Voucher Grid (click one-by-one) */}
       {showVouchers && (
         <VoucherGrid onAllViewed={handleAllViewed} />
       )}
 
-      {/* Scene 05 is the FinaleModal above (portal-style) */}
+      {/* Scene 05 — FinaleModal (portal above) */}
     </>
   );
 }
