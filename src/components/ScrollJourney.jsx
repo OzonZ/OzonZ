@@ -12,7 +12,7 @@ function AmbientParticle({ index, progress }) {
   const INITIAL_COLORS = ['#FFA07A', '#FF69B4', '#B388FF', '#FFD166', '#FF8DA1'];
   const FINAL_COLORS = ['rgba(255,255,255,0.95)', 'rgba(255,209,220,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,209,220,0.95)', 'rgba(255,255,255,0.85)'];
 
-  const color = progress > 0.3 ? FINAL_COLORS[index % 5] : INITIAL_COLORS[index % 5];
+  const color = progress > 0.35 ? FINAL_COLORS[index % 5] : INITIAL_COLORS[index % 5];
   const opacity = Math.min(Math.max(progress * 1.5, 0.3), 0.85);
 
   return (
@@ -65,7 +65,7 @@ function SpeechBubbleCard({ text, side, visible }) {
   );
 }
 
-export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
+export default function ScrollJourney({ onOpenBox }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -77,44 +77,44 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Compute seamless background color based on progress (0 -> 1)
-  // #ffffff (255,255,255) -> #ffebf0 (255,235,240)
-  const g = Math.round(255 - progress * 20);
-  const b = Math.round(255 - progress * 15);
+  // Compute seamless background color with generous initial air time
+  // Pure white (0 -> 0.20) -> Smoothly morphs to pastel pink #ffebf0 (0.20 -> 0.45)
+  const morphRatio = Math.min(Math.max((progress - 0.20) / 0.25, 0), 1);
+  const g = Math.round(255 - morphRatio * 20); // 255 -> 235
+  const b = Math.round(255 - morphRatio * 15); // 255 -> 240
   const bgColor = `rgb(255, ${g}, ${b})`;
 
-  // Scene 01 (Hero Landing): Fades out smoothly from progress 0 -> 0.16
-  const heroOpacity = Math.max(1 - progress / 0.16, 0);
-  const heroY = -progress * 250;
-  const heroScale = 1 - progress * 0.3;
+  // Scene 01 (Hero Landing): Stays visible during initial scroll, then fades out from 0.20 -> 0.32
+  const heroOpacity = progress < 0.20 ? 1 : Math.max(1 - (progress - 0.20) / 0.12, 0);
+  const heroY = progress < 0.20 ? 0 : -(progress - 0.20) * 350;
+  const heroScale = progress < 0.20 ? 1 : 1 - (progress - 0.20) * 0.4;
   const heroVisible = heroOpacity > 0.01;
 
-  // Scene 02 (Gift Box Centerpiece): Appears as you scroll down
-  const boxOpacity = Math.min(Math.max((progress - 0.06) / 0.12, 0), 1);
-  const boxScale = 0.85 + progress * 0.35;
-  const boxY = Math.max(40 - progress * 200, 0);
-  const canOpen = progress >= 0.65;
+  // Scene 02 (Gift Box Centerpiece): Enters from 0.24 -> 0.36, stays centered throughout
+  const boxOpacity = Math.min(Math.max((progress - 0.24) / 0.12, 0), 1);
+  const boxScale = 0.88 + progress * 0.32;
+  const canOpen = progress >= 0.75;
 
-  // Speech bubble active steps
-  const bubble1Active = progress >= 0.18 && progress < 0.36;
-  const bubble2Active = progress >= 0.36 && progress < 0.54;
-  const bubble3Active = progress >= 0.54 && progress < 0.72;
+  // Speech bubble active ranges (with clear spacing)
+  const bubble1Active = progress >= 0.36 && progress < 0.50;
+  const bubble2Active = progress >= 0.50 && progress < 0.64;
+  const bubble3Active = progress >= 0.64 && progress < 0.78;
 
   // Bottom scroll hint
-  const hintOpacity = progress < 0.7 ? Math.max(0.75 - progress, 0.35) : 0;
+  const hintOpacity = progress < 0.75 ? Math.max(0.75 - progress * 0.5, 0.35) : 0;
 
   return (
     <div
       style={{
-        height: '320vh', // 3.2 viewports for smooth scrolling
+        height: '380vh', // Generous 3.8 viewports for air time & 2-stage scroll morph
         position: 'relative',
       }}
     >
-      {/* ─── FIXED FULLSCREEN CANVAS (No seams, perfect morph) ─────────── */}
+      {/* ─── FIXED FULLSCREEN CANVAS (Zero seams, perfect background morph) ─ */}
       <div
         style={{
           position: 'fixed',
@@ -152,7 +152,7 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
           pointerEvents: 'none',
         }}
       >
-        {/* ─── SCENE 01: HERO ENTRY (Fades to none on scroll) ─────────── */}
+        {/* ─── SCENE 01: HERO ENTRY (Generous Air Time, No Arrow Button) ─ */}
         {heroVisible && (
           <div
             style={{
@@ -168,7 +168,6 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
               transform: `translateY(${heroY}px) scale(${heroScale})`,
               pointerEvents: heroOpacity > 0.2 ? 'auto' : 'none',
               zIndex: 15,
-              transition: 'opacity 0.05s linear',
             }}
           >
             <div style={{ maxWidth: '680px', margin: '0 auto' }}>
@@ -194,41 +193,17 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
                   fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
                   color: 'var(--text-muted)',
                   lineHeight: 1.7,
-                  marginBottom: '36px',
+                  marginBottom: '28px',
                   maxWidth: '520px',
-                  margin: '0 auto 36px',
+                  margin: '0 auto 28px',
                 }}
               >
                 He created this secret corner of the web just for you to find
                 what's waiting down below.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                <p style={{ fontFamily: 'var(--font-head)', fontWeight: 600, color: 'var(--primary)', fontSize: '1rem' }}>
-                  Try scrolling down to see... Good luck! ✨
-                </p>
-                <div
-                  className="bounce-arrow"
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    background: 'linear-gradient(135deg, #ff8da1, #ff6b8b)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 6px 20px rgba(255, 141, 161, 0.4)',
-                    color: '#fff',
-                    fontSize: '20px',
-                    cursor: 'pointer',
-                    pointerEvents: 'auto',
-                  }}
-                  onClick={() => {
-                    window.scrollTo({ top: window.innerHeight * 1.5, behavior: 'smooth' });
-                  }}
-                >
-                  ↓
-                </div>
-              </div>
+              <p style={{ fontFamily: 'var(--font-head)', fontWeight: 600, color: 'var(--primary)', fontSize: '1rem' }}>
+                Try scrolling down to see... Good luck! ✨
+              </p>
             </div>
           </div>
         )}
@@ -250,22 +225,21 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
           visible={bubble3Active}
         />
 
-        {/* ─── SCENE 02 & 03: CLAYMORPHIC GIFT BOX & DISCOVERY ─────────── */}
+        {/* ─── SCENE 02 & 03: CLAYMORPHIC 3D GIFT BOX CENTERPIECE ──────── */}
         <div
           style={{
             opacity: boxOpacity,
-            transform: `translateY(${boxY}px) scale(${boxScale})`,
+            transform: `scale(${boxScale})`,
             zIndex: 20,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             pointerEvents: boxOpacity > 0.2 ? 'auto' : 'none',
-            transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
+            transition: 'opacity 0.2s ease-out, transform 0.15s ease-out',
           }}
         >
           <BoxReveal
-            onOpenEnvelope={onOpenEnvelope}
-            onOpenPostcard={onOpenPostcard}
+            onOpenBox={onOpenBox}
             canOpen={canOpen}
           />
         </div>

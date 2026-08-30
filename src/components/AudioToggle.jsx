@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Music, Music2, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Music, Music2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toggleBgm, subscribeAudioState } from '../lib/audio';
 
@@ -8,6 +8,7 @@ export default function AudioToggle() {
     isBgmPlaying: false,
     currentTrack: 'main',
     isMuted: false,
+    trackInfo: { title: 'The Greenhouse Hour' },
   });
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function AudioToggle() {
       title={audioState.isBgmPlaying ? 'Pause Music' : 'Play Music'}
       style={{
         borderColor: isPostcard ? 'rgba(179, 136, 255, 0.5)' : 'rgba(255, 141, 161, 0.4)',
-        background: isPostcard ? 'rgba(255, 245, 250, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+        background: isPostcard ? 'rgba(255, 245, 250, 0.94)' : 'rgba(255, 255, 255, 0.94)',
       }}
     >
       <motion.span
@@ -48,10 +49,10 @@ export default function AudioToggle() {
           <Music size={15} color="#8d99ae" />
         )}
       </motion.span>
-      
-      <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+
+      <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>
         {audioState.isBgmPlaying ? (
-          isPostcard ? '🎵 Postcard Melody' : '🎵 Gift BGM: ON'
+          isPostcard ? '🎵 Dept - Strawberry Champagne' : '🎵 The Greenhouse Hour'
         ) : (
           '🔇 Music: OFF'
         )}

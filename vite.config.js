@@ -4,6 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   base: '/OzonZ/',
+  server: {
+    watch: {
+      ignored: ['**/public/**']
+    }
+  },
   plugins: [
     react(),
     tailwindcss(),

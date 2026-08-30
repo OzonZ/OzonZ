@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, X, RotateCw, Music2 } from 'lucide-react';
+import { X, RotateCw, Music2 } from 'lucide-react';
 import { switchBgmTrack, sfxRustle, sfxFlip, sfxSparkle } from '../lib/audio';
 
 export default function PostCardModal({ isOpen, onClose }) {
@@ -10,10 +10,10 @@ export default function PostCardModal({ isOpen, onClose }) {
     if (isOpen) {
       sfxRustle();
       sfxSparkle();
-      // Switch to the warm, emotional postcard BGM track
+      // Switch to the Dept - Strawberry Champagne track
       switchBgmTrack('postcard');
     } else {
-      // Switch back to the cheerful main gift reveal BGM
+      // Switch back to The Greenhouse Hour main track
       switchBgmTrack('main');
     }
   }, [isOpen]);
@@ -143,9 +143,9 @@ export default function PostCardModal({ isOpen, onClose }) {
                       <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, color: 'var(--primary-dark)', fontSize: '1.1rem' }}>
                         💌 Secret Postcard
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                         <Music2 size={12} color="#b388ff" />
-                        <span>Playing: Sentimental Postcard Theme</span>
+                        <span style={{ fontWeight: 600, color: '#7c4dff' }}>Dept - Strawberry Champagne 🍓🍾</span>
                       </div>
                     </div>
                   </div>
@@ -241,7 +241,7 @@ export default function PostCardModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* ─── BACK SIDE: Memory Polaroid & Handwritten Note ────────── */}
+              {/* ─── BACK SIDE: Memory Polaroid & Note ────────────────────── */}
               <div
                 style={{
                   backfaceVisibility: 'hidden',

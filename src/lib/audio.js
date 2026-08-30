@@ -1,14 +1,17 @@
 /**
  * Web Audio API & HTML5 Audio Hybrid Engine
- * - Supports custom MP3 files in public/audio/ (bgm-main.mp3 & bgm-postcard.mp3)
- * - Graceful zero-dependency Web Audio API synthesizer fallback if MP3s are not present
- * - Multiple SFX presets (pop, rustle, chime, flip, whoosh)
+ * - Main Track: "The Greenhouse Hour" (public/audio/bgm-main.mp3 or The_Greenhouse_Hour.mp3)
+ * - Postcard Track: "Dept - Strawberry Champagne" (public/audio/bgm-postcard.mp3)
+ * - Automatic permanent switch to Postcard Track once Postcard is viewed
+ * - Graceful fallback to Web Audio API synthesizer if MP3s fail to load
+ * - Multiple SFX presets (pop, rustle, chime, flip, whoosh, sparkle)
  */
 
 let audioCtx = null;
 let isMuted = false;
 let isBgmPlaying = false;
 let currentTrack = 'main'; // 'main' | 'postcard'
+let hasSwitchedToPostcard = false;
 
 // HTML5 Audio instances for custom MP3s
 let mainAudioEl = null;
@@ -19,7 +22,19 @@ let usingHtmlAudio = false;
 let bgmIntervalId = null;
 let bgmStep = 0;
 
-// ─── Musical Notes Frequency Map ─────────────────────────────────────────────
+// Track Information for UI
+export const TRACK_INFO = {
+  main: {
+    title: 'The Greenhouse Hour',
+    artist: 'Main Theme',
+  },
+  postcard: {
+    title: 'Dept - Strawberry Champagne',
+    artist: 'Dept',
+  },
+};
+
+// ─── Musical Notes Frequency Map (Synth Fallback) ───────────────────────────
 const NOTES = {
   C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
   C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
@@ -27,7 +42,6 @@ const NOTES = {
   C6: 1046.50
 };
 
-// Track 1: Playful & Cute Gift Reveal Theme
 const MELODY_MAIN = [
   NOTES.E5, NOTES.D5, NOTES.C5, NOTES.D5,
   NOTES.E5, NOTES.E5, NOTES.E5, NOTES.G5,
@@ -39,7 +53,6 @@ const MELODY_MAIN = [
   NOTES.C5, NOTES.C5, NOTES.C5, NOTES.C5,
 ];
 
-// Track 2: Warm, Nostalgic & Emotional Postcard Theme
 const MELODY_POSTCARD = [
   NOTES.C4, NOTES.E4, NOTES.G4, NOTES.C5,
   NOTES.B4, NOTES.G4, NOTES.E4, NOTES.G4,
@@ -55,12 +68,28 @@ const MELODY_POSTCARD = [
 const stateListeners = new Set();
 
 function notifyListeners() {
-  stateListeners.forEach((fn) => fn({ isBgmPlaying, currentTrack, isMuted }));
+  stateListeners.forEach((fn) =>
+    fn({
+      isBgmPlaying,
+      currentTrack,
+      isMuted,
+      trackInfo: TRACK_INFO[currentTrack],
+      usingHtmlAudio,
+      hasSwitchedToPostcard,
+    })
+  );
 }
 
 export function subscribeAudioState(fn) {
   stateListeners.add(fn);
-  fn({ isBgmPlaying, currentTrack, isMuted });
+  fn({
+    isBgmPlaying,
+    currentTrack,
+    isMuted,
+    trackInfo: TRACK_INFO[currentTrack],
+    usingHtmlAudio,
+    hasSwitchedToPostcard,
+  });
   return () => stateListeners.delete(fn);
 }
 
@@ -94,16 +123,28 @@ function playTone(freq, duration, type = 'triangle', gainVal = 0.08) {
   } catch (_) {}
 }
 
-// ─── MP3 Track Setup (with fallback test) ─────────────────────────────────────
+// ─── MP3 Track Setup (Resolves relative to base URL) ─────────────────────────
+const BASE_URL = import.meta.env.BASE_URL || '/';
+const cleanBase = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+
 const MP3_PATHS = {
-  main: ['./audio/bgm-main.mp3', '/OzonZ/audio/bgm-main.mp3', './bgm-main.mp3'],
-  postcard: ['./audio/bgm-postcard.mp3', '/OzonZ/audio/bgm-postcard.mp3', './bgm-postcard.mp3']
+  main: [
+    `${cleanBase}audio/bgm-main.mp3`,
+    `${cleanBase}audio/The_Greenhouse_Hour.mp3`,
+    './audio/bgm-main.mp3',
+    './audio/The_Greenhouse_Hour.mp3',
+  ],
+  postcard: [
+    `${cleanBase}audio/bgm-postcard.mp3`,
+    `${cleanBase}audio/Dept-%20Strawberry%20Champagne%20Official%20lyrics%20video.mp3`,
+    './audio/bgm-postcard.mp3',
+  ],
 };
 
 function tryCreateAudioElement(paths) {
   const audio = new Audio();
   audio.loop = true;
-  audio.volume = 0.5;
+  audio.volume = 0.65;
   let pathIndex = 0;
 
   audio.src = paths[pathIndex];
@@ -116,7 +157,6 @@ function tryCreateAudioElement(paths) {
   return audio;
 }
 
-// Try initializing HTML5 Audio
 try {
   mainAudioEl = tryCreateAudioElement(MP3_PATHS.main);
   postcardAudioEl = tryCreateAudioElement(MP3_PATHS.postcard);
@@ -129,12 +169,14 @@ export function startBgm(track = currentTrack) {
   isBgmPlaying = true;
   stopSynthBgm();
 
-  // Try playing MP3 first
   const targetAudio = track === 'postcard' ? postcardAudioEl : mainAudioEl;
   const otherAudio = track === 'postcard' ? mainAudioEl : postcardAudioEl;
 
   if (otherAudio) {
-    try { otherAudio.pause(); } catch (_) {}
+    try {
+      otherAudio.pause();
+      otherAudio.currentTime = 0;
+    } catch (_) {}
   }
 
   if (targetAudio && targetAudio.src && !isMuted) {
@@ -146,7 +188,6 @@ export function startBgm(track = currentTrack) {
           notifyListeners();
         })
         .catch(() => {
-          // MP3 not found or blocked -> Fallback to synthesizer
           usingHtmlAudio = false;
           startSynthBgm(track);
         });
@@ -167,10 +208,9 @@ function startSynthBgm(track = 'main') {
   bgmIntervalId = setInterval(() => {
     if (isMuted) return;
     const note = melody[bgmStep % melody.length];
-    playTone(note, speed / 1000 * 0.9, oscType, track === 'postcard' ? 0.07 : 0.06);
-    // Warm bass harmonic
+    playTone(note, (speed / 1000) * 0.9, oscType, track === 'postcard' ? 0.07 : 0.06);
     if (bgmStep % 2 === 0) {
-      playTone(note / 2, speed / 1000 * 1.5, 'sine', 0.03);
+      playTone(note / 2, (speed / 1000) * 1.5, 'sine', 0.03);
     }
     bgmStep++;
   }, speed);
@@ -205,8 +245,26 @@ export function toggleBgm() {
   }
 }
 
+/**
+ * Switch permanently to Postcard track ("Dept - Strawberry Champagne")
+ */
+export function triggerPostcardMusicPermanent() {
+  hasSwitchedToPostcard = true;
+  currentTrack = 'postcard';
+  if (isBgmPlaying) {
+    startBgm('postcard');
+  } else {
+    // If BGM was off, auto-start the song when opening postcard for maximum emotion
+    startBgm('postcard');
+  }
+  notifyListeners();
+}
+
 export function switchBgmTrack(trackName) {
-  if (currentTrack === trackName) return;
+  if (hasSwitchedToPostcard && trackName === 'main') {
+    // Keep postcard track active once discovered!
+    return;
+  }
   currentTrack = trackName;
   if (isBgmPlaying) {
     startBgm(trackName);
