@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import BoxReveal from './BoxReveal';
+
 // Speech Bubble with spring animation
 function SpeechBubbleCard({ text, side, visible }) {
   return (
