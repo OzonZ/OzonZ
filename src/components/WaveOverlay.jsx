@@ -1,9 +1,10 @@
 /**
  * WaveOverlay — 4 smooth SVG sinusoidal wave layers that loop horizontally forever.
- * Each SVG is 200% wide with the path tiled twice, then animated translateX(0→-50%)
- * for a seamless infinite scroll effect.
+ * Supports translateYPercent and opacity props for scroll-driven floating upward transitions.
  */
-export default function WaveOverlay() {
+export default function WaveOverlay({ translateYPercent = 0, opacity = 1 }) {
+  if (opacity <= 0.001) return null;
+
   return (
     <div
       aria-hidden="true"
@@ -13,6 +14,10 @@ export default function WaveOverlay() {
         overflow: 'hidden',
         pointerEvents: 'none',
         zIndex: 2,
+        transform: `translateY(${translateYPercent}%)`,
+        opacity: opacity,
+        transition: 'opacity 0.08s linear, transform 0.08s linear',
+        willChange: 'transform, opacity',
       }}
     >
       <style>{`
@@ -45,7 +50,7 @@ export default function WaveOverlay() {
           left: 0,
           width: '200%',
           height: '100%',
-          opacity: 0.1,
+          opacity: 0.12,
           animation: 'waveLoop1 18s linear infinite',
         }}
       >
@@ -69,7 +74,7 @@ export default function WaveOverlay() {
           left: 0,
           width: '200%',
           height: '100%',
-          opacity: 0.08,
+          opacity: 0.10,
           animation: 'waveLoop2 24s linear infinite reverse',
         }}
       >
@@ -92,7 +97,7 @@ export default function WaveOverlay() {
           left: 0,
           width: '200%',
           height: '100%',
-          opacity: 0.07,
+          opacity: 0.08,
           animation: 'waveLoop3 14s linear infinite',
         }}
       >
@@ -115,7 +120,7 @@ export default function WaveOverlay() {
           left: 0,
           width: '200%',
           height: '100%',
-          opacity: 0.06,
+          opacity: 0.09,
           animation: 'waveLoop4 10s linear infinite reverse',
         }}
       >

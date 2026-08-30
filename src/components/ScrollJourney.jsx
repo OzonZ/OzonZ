@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BoxReveal from './BoxReveal';
 import WaveOverlay from './WaveOverlay';
+import PinkWindParticles from './PinkWindParticles';
 
 // Speech Bubble with spring animation
 function SpeechBubbleCard({ text, side, visible }) {
@@ -47,40 +48,55 @@ export default function ScrollJourney({ onOpenBox }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Compute seamless background color with generous initial air time
-  // Pure white (0 -> 0.20) -> Smoothly morphs to pastel pink #ffebf0 (0.20 -> 0.45)
-  const morphRatio = Math.min(Math.max((progress - 0.20) / 0.25, 0), 1);
-  const g = Math.round(255 - morphRatio * 20); // 255 -> 235
-  const b = Math.round(255 - morphRatio * 15); // 255 -> 240
+  // ─── STAGE 2: BACKGROUND GRADUAL COLOR MORPH (0.08 -> 0.48) ────────────────
+  // Little by little transforms into warm pastel pink rgb(255, 222, 234)
+  const morphRatio = Math.min(Math.max((progress - 0.08) / 0.40, 0), 1);
+  const g = Math.round(255 - morphRatio * 33); // 255 -> 222
+  const b = Math.round(255 - morphRatio * 21); // 255 -> 234
   const bgColor = `rgb(255, ${g}, ${b})`;
 
-  // Scene 01 (Hero Landing): Stays visible during initial scroll, then fades out from 0.20 -> 0.32
-  const heroOpacity = progress < 0.20 ? 1 : Math.max(1 - (progress - 0.20) / 0.12, 0);
-  const heroY = progress < 0.20 ? 0 : -(progress - 0.20) * 350;
-  const heroScale = progress < 0.20 ? 1 : 1 - (progress - 0.20) * 0.4;
+  // ─── STAGE 1: HERO TEXT FLOATS OUT & UP (0.00 -> 0.18) ─────────────────────
+  const heroFloatRatio = Math.min(progress / 0.18, 1);
+  const heroOpacity = Math.max(1 - heroFloatRatio, 0);
+  const heroY = -heroFloatRatio * 260; // Floats out and UP
+  const heroScale = 1 - heroFloatRatio * 0.1;
   const heroVisible = heroOpacity > 0.01;
 
-  // Scene 02 (Gift Box Centerpiece): Enters from 0.24 -> 0.36, stays centered throughout
-  const boxOpacity = Math.min(Math.max((progress - 0.24) / 0.12, 0), 1);
-  const boxScale = 0.88 + progress * 0.32;
-  const canOpen = progress >= 0.75;
+  // ─── STAGE 1 & 2: PINK WIND PARTICLES (0.00 -> 0.26) ────────────────────────
+  // Floats up from bottom like wind, then opacity fades down to none
+  const particleOpacity = progress <= 0.08
+    ? 1.0
+    : Math.max(0, 1 - (progress - 0.08) / 0.18);
 
-  // Speech bubble active ranges (with clear spacing)
-  const bubble1Active = progress >= 0.36 && progress < 0.50;
-  const bubble2Active = progress >= 0.50 && progress < 0.64;
-  const bubble3Active = progress >= 0.64 && progress < 0.78;
+  // ─── STAGE 3: WAVES FLOAT UP TO TOP AND FADE TO NONE (0.12 -> 0.54) ────────
+  const waveRiseRatio = Math.min(Math.max((progress - 0.12) / 0.42, 0), 1);
+  const waveYPercent = -waveRiseRatio * 105; // Rises all the way past top of viewport
+  const waveOpacity = progress <= 0.38
+    ? 1.0
+    : Math.max(0, 1 - (progress - 0.38) / 0.16);
 
-  // Bottom scroll hint
-  const hintOpacity = progress < 0.75 ? Math.max(0.75 - progress * 0.5, 0.35) : 0;
+  // ─── STAGE 4: FOURTH SCROLL BOX REVEAL (0.56 -> 1.00) ──────────────────────
+  const boxProgress = Math.min(Math.max((progress - 0.56) / 0.16, 0), 1);
+  const boxOpacity = boxProgress;
+  const boxScale = 0.82 + boxProgress * 0.18 + (progress > 0.72 ? (progress - 0.72) * 0.08 : 0);
+  const canOpen = progress >= 0.78;
+
+  // Speech bubbles leading up to and during box stage
+  const bubble1Active = progress >= 0.60 && progress < 0.72;
+  const bubble2Active = progress >= 0.72 && progress < 0.84;
+  const bubble3Active = progress >= 0.84 && progress < 0.98;
+
+  // Dynamic bottom scroll hint
+  const hintOpacity = progress < 0.75 ? Math.max(0.8 - progress * 0.6, 0.3) : 0;
 
   return (
     <div
       style={{
-        height: '380vh', // Generous 3.8 viewports for air time & 2-stage scroll morph
+        height: '420vh', // 4 distinct immersive scroll stages
         position: 'relative',
       }}
     >
-      {/* ─── FIXED FULLSCREEN CANVAS (Zero seams, perfect background morph) ─ */}
+      {/* ─── FIXED FULLSCREEN CANVAS (Seamless Background & Wave Morph) ────── */}
       <div
         style={{
           position: 'fixed',
@@ -91,16 +107,19 @@ export default function ScrollJourney({ onOpenBox }) {
           transition: 'background-color 0.1s linear',
         }}
       >
-        {/* Animated Mesh Gradient Blobs (original pastel background) */}
+        {/* Animated Mesh Gradient Blobs */}
         <div className="mesh-bg">
           <div className="mesh-blob mesh-blob-1" />
           <div className="mesh-blob mesh-blob-2" />
           <div className="mesh-blob mesh-blob-3" />
         </div>
 
-        {/* Subtle SVG Sinusoidal Wave Overlay */}
-        <WaveOverlay />
+        {/* Dynamic Sinusoidal Waves (Floating Upward & Fading Out) */}
+        <WaveOverlay translateYPercent={waveYPercent} opacity={waveOpacity} />
       </div>
+
+      {/* ─── SCENE 1: PINK WIND PARTICLES (Float from Bottom) ─────────────── */}
+      <PinkWindParticles opacity={particleOpacity} />
 
       {/* ─── FIXED INTERACTIVE VIEWPORT SCENE ───────────────────────────── */}
       <div
@@ -116,7 +135,7 @@ export default function ScrollJourney({ onOpenBox }) {
           pointerEvents: 'none',
         }}
       >
-        {/* ─── SCENE 01: HERO ENTRY (Generous Air Time, No Arrow Button) ─ */}
+        {/* ─── SCENE 01: HERO ENTRY (Floats Out and UP on First Scroll) ─── */}
         {heroVisible && (
           <div
             style={{
@@ -132,10 +151,10 @@ export default function ScrollJourney({ onOpenBox }) {
               transform: `translateY(${heroY}px) scale(${heroScale})`,
               pointerEvents: heroOpacity > 0.2 ? 'auto' : 'none',
               zIndex: 15,
+              willChange: 'transform, opacity',
             }}
           >
             <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '16px' }}></div>
               <h1
                 style={{
                   fontFamily: 'var(--font-head)',
@@ -172,24 +191,24 @@ export default function ScrollJourney({ onOpenBox }) {
           </div>
         )}
 
-        {/* ─── SCENE 02: SCROLL-DRIVEN SPEECH BUBBLES ───────────────────── */}
+        {/* ─── SCENE 04: SCROLL-DRIVEN SPEECH BUBBLES ───────────────────── */}
         <SpeechBubbleCard
           text='"Oh look, a surprise gift box!"'
           side="left"
           visible={bubble1Active}
         />
         <SpeechBubbleCard
-          text='"So exciting!"'
+          text='"So exciting! I wonder what is inside...?"'
           side="right"
           visible={bubble2Active}
         />
         <SpeechBubbleCard
-          text='"I wonder what could be inside...?"'
+          text='"Tap the box to open! 🎁"'
           side="left"
           visible={bubble3Active}
         />
 
-        {/* ─── SCENE 02 & 03: CLAYMORPHIC 3D GIFT BOX CENTERPIECE ──────── */}
+        {/* ─── SCENE 04: CLAYMORPHIC 3D GIFT BOX CENTERPIECE ────────────── */}
         <div
           style={{
             opacity: boxOpacity,
@@ -198,8 +217,9 @@ export default function ScrollJourney({ onOpenBox }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            pointerEvents: boxOpacity > 0.2 ? 'auto' : 'none',
-            transition: 'opacity 0.2s ease-out, transform 0.15s ease-out',
+            pointerEvents: boxOpacity > 0.3 ? 'auto' : 'none',
+            transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
+            willChange: 'transform, opacity',
           }}
         >
           <BoxReveal
