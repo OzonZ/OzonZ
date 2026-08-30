@@ -42,21 +42,74 @@ body {
 }
 
 /* =============================================
-   ANIMATED WAVE BACKGROUND
+   ANIMATED MESH GRADIENT BACKGROUND
+   ============================================= */
+.mesh-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: blobFloat 8s ease-in-out infinite;
+}
+
+.mesh-blob-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffa07a, transparent 70%);
+  top: -150px;
+  left: -100px;
+  animation-delay: 0s;
+  animation-duration: 9s;
+}
+
+.mesh-blob-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #ff69b4, transparent 70%);
+  top: -200px;
+  right: -150px;
+  animation-delay: -3s;
+  animation-duration: 11s;
+}
+
+.mesh-blob-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #b388ff, transparent 70%);
+  bottom: -100px;
+  left: 30%;
+  animation-delay: -6s;
+  animation-duration: 13s;
+}
+
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.97); }
+}
+
+/* =============================================
+   ANIMATED WAVE OVERLAY (subtle fancy layer)
    ============================================= */
 .wave-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  border-radius: inherit;
 }
 
 .wave {
   position: absolute;
   width: 200vmax;
   height: 200vmax;
-  opacity: 0.55;
+  opacity: 0.05;
   left: 50%;
   top: 50%;
   margin-left: -100vmax;
@@ -68,13 +121,11 @@ body {
 }
 
 .wave:nth-child(2) {
-  opacity: 0.45;
   animation-duration: 50s;
   animation-direction: reverse;
 }
 
 .wave:nth-child(3) {
-  opacity: 0.38;
   animation-duration: 45s;
 }
 

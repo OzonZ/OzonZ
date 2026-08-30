@@ -90,7 +90,14 @@ export default function ScrollJourney({ onOpenBox }) {
           transition: 'background-color 0.1s linear',
         }}
       >
-        {/* Animated Wave Background */}
+        {/* Animated Mesh Gradient Blobs (original pastel background) */}
+        <div className="mesh-bg">
+          <div className="mesh-blob mesh-blob-1" />
+          <div className="mesh-blob mesh-blob-2" />
+          <div className="mesh-blob mesh-blob-3" />
+        </div>
+
+        {/* Subtle Wave Overlay — 5% opacity for a fancy shimmer */}
         <div className="wave-bg">
           <div className="wave" />
           <div className="wave" />
