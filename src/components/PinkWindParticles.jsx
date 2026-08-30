@@ -4,7 +4,9 @@ import { useEffect, useRef } from 'react';
  * PinkWindParticles — A lightweight HTML5 canvas particle & wind breeze system.
  * Features:
  * - Subtle, low-opacity soft pink & white floating circular particles.
- * - Vertical pixel/dashed white wind streaks rising like gentle breeze trails (as in Until Then style).
+ * - Snake/Follow-the-leader white wind streaks: Head moves upward in a zigzag,
+ *   and trailing child segments follow the exact path carved out by the head.
+ * - Randomized big, medium, and small wind streams.
  * - Smoothly responds to scroll opacity prop.
  */
 export default function PinkWindParticles({ opacity = 1 }) {
@@ -37,17 +39,17 @@ export default function PinkWindParticles({ opacity = 1 }) {
       'rgba(255, 218, 225, ',   // Blush White-Pink
     ];
 
-    const CIRCLE_COUNT = Math.min(Math.floor(width / 70), 18); // Reduced count
+    const CIRCLE_COUNT = Math.min(Math.floor(width / 75), 16);
 
     const createCircleParticle = (initialY = null) => ({
       x: Math.random() * width,
       y: initialY !== null ? initialY : height + Math.random() * 60,
-      radius: 2 + Math.random() * 3.5, // Small delicate size
-      speedY: 0.6 + Math.random() * 1.0, // Gentle upward speed
+      radius: 2 + Math.random() * 3.5,
+      speedY: 0.6 + Math.random() * 0.9,
       swaySpeed: 0.0012 + Math.random() * 0.002,
       swayAmp: 10 + Math.random() * 20,
       phase: Math.random() * Math.PI * 2,
-      baseAlpha: 0.12 + Math.random() * 0.22, // Low subtle opacity
+      baseAlpha: 0.10 + Math.random() * 0.20,
       colorPrefix: CIRCLE_COLORS[Math.floor(Math.random() * CIRCLE_COLORS.length)],
       pulseSpeed: 0.002 + Math.random() * 0.003,
     });
@@ -56,27 +58,70 @@ export default function PinkWindParticles({ opacity = 1 }) {
       createCircleParticle(Math.random() * height)
     );
 
-    // ─── 2. WHITE WIND STREAKS (Dashed vertical columns like in Image 2) ─────
-    const WIND_STREAM_COUNT = Math.min(Math.floor(width / 220), 6); // 4-6 streams
+    // ─── 2. FOLLOW-THE-LEADER ZIGZAG WIND STREAMS (Path History Trail) ───────
+    const WIND_STREAM_COUNT = Math.min(Math.floor(width / 180), 8); // 5-8 streams
 
     const createWindStream = (initialY = null) => {
-      const segmentCount = 7 + Math.floor(Math.random() * 8); // 7 to 14 segments
-      const blockSize = 3.5 + Math.random() * 1.5; // ~4px
-      const gap = 3 + Math.random() * 2; // ~4px gap
-      const streamHeight = segmentCount * (blockSize + gap);
+      const sizeType = Math.random(); // 0-0.35: small, 0.35-0.75: medium, 0.75-1.0: big
+
+      let segmentCount, blockSize, sampleSpacing, zigzagAmp, zigzagSpeed, speedY, baseAlpha;
+
+      if (sizeType < 0.35) {
+        // Small quick delicate breeze
+        segmentCount = 7 + Math.floor(Math.random() * 5); // 7 to 11 child blocks
+        blockSize = 2.8 + Math.random() * 0.8;
+        sampleSpacing = 4;
+        zigzagAmp = 9 + Math.random() * 6; // ~9-15px zigzag width
+        zigzagSpeed = 0.0032 + Math.random() * 0.0012;
+        speedY = 1.6 + Math.random() * 0.7;
+        baseAlpha = 0.25 + Math.random() * 0.18;
+      } else if (sizeType < 0.75) {
+        // Medium standard wavy breeze
+        segmentCount = 12 + Math.floor(Math.random() * 6); // 12 to 17 child blocks
+        blockSize = 3.8 + Math.random() * 1.0;
+        sampleSpacing = 5;
+        zigzagAmp = 15 + Math.random() * 8; // ~15-23px zigzag width
+        zigzagSpeed = 0.0026 + Math.random() * 0.0010;
+        speedY = 1.3 + Math.random() * 0.5;
+        baseAlpha = 0.30 + Math.random() * 0.20;
+      } else {
+        // Big prominent winding wind gust
+        segmentCount = 18 + Math.floor(Math.random() * 8); // 18 to 25 child blocks
+        blockSize = 4.8 + Math.random() * 1.4;
+        sampleSpacing = 6;
+        zigzagAmp = 22 + Math.random() * 10; // ~22-32px zigzag width
+        zigzagSpeed = 0.0020 + Math.random() * 0.0008;
+        speedY = 1.0 + Math.random() * 0.4;
+        baseAlpha = 0.35 + Math.random() * 0.22;
+      }
+
+      const maxHistory = segmentCount * sampleSpacing + 15;
+      const baseX = Math.random() * width;
+      const startY = initialY !== null ? initialY : height + 30 + Math.random() * (height * 0.6);
+      const phase = Math.random() * Math.PI * 2;
+
+      // Pre-populate trail history
+      const trail = [];
+      for (let i = 0; i < maxHistory; i++) {
+        const histY = startY + i * speedY;
+        const histX = baseX + Math.sin(phase - i * (zigzagSpeed * 16)) * zigzagAmp;
+        trail.push({ x: histX, y: histY });
+      }
 
       return {
-        x: Math.random() * width,
-        y: initialY !== null ? initialY : height + 20 + Math.random() * (height * 0.5),
-        speedY: 1.2 + Math.random() * 1.4, // Rising speed
+        baseX,
+        headY: startY,
+        headX: baseX,
+        speedY,
         segmentCount,
         blockSize,
-        gap,
-        streamHeight,
-        baseAlpha: 0.25 + Math.random() * 0.35, // Translucent white
-        swaySpeed: 0.0008 + Math.random() * 0.0015,
-        swayAmp: 4 + Math.random() * 8,
-        phase: Math.random() * Math.PI * 2,
+        sampleSpacing,
+        zigzagAmp,
+        zigzagSpeed,
+        baseAlpha,
+        phase,
+        maxHistory,
+        trail,
       };
     };
 
@@ -91,33 +136,49 @@ export default function PinkWindParticles({ opacity = 1 }) {
       ctx.clearRect(0, 0, width, height);
 
       if (opacity > 0.005) {
-        // ─── Draw White Wind Streams (Image 2 style dashed breeze) ─────────
+        // ─── Draw Follow-the-Leader Wavy Wind Streams ─────────────────────
         for (let i = 0; i < windStreams.length; i++) {
           const stream = windStreams[i];
-          stream.y -= stream.speedY;
 
-          const sway = Math.sin(elapsed * stream.swaySpeed + stream.phase) * stream.swayAmp;
-          const currentX = stream.x + sway;
+          // 1. Move the head upward with a zigzag oscillation
+          stream.headY -= stream.speedY;
+          stream.headX =
+            stream.baseX + Math.sin(elapsed * stream.zigzagSpeed + stream.phase) * stream.zigzagAmp;
 
-          // Reset when whole stream moves off top
-          if (stream.y < -stream.streamHeight - 20) {
-            windStreams[i] = createWindStream(height + 10 + Math.random() * 120);
+          // 2. Push head position into historical trail
+          stream.trail.unshift({ x: stream.headX, y: stream.headY });
+          if (stream.trail.length > stream.maxHistory) {
+            stream.trail.pop();
+          }
+
+          // 3. Check if the entire tail has exited past the top
+          const lastPoint = stream.trail[stream.trail.length - 1];
+          if (lastPoint && lastPoint.y < -40) {
+            windStreams[i] = createWindStream(height + 20 + Math.random() * 120);
             continue;
           }
 
+          // 4. Draw children following the head's exact path
           for (let s = 0; s < stream.segmentCount; s++) {
-            const segY = stream.y + s * (stream.blockSize + stream.gap);
+            const historyIndex = s * stream.sampleSpacing;
+            if (historyIndex >= stream.trail.length) break;
 
-            // Taper head and tail of stream for soft organic entrance/exit
+            const pt = stream.trail[historyIndex];
+
+            // Taper opacity: softly fades at head and tail ends
             const normalizedPos = s / (stream.segmentCount - 1);
             const taper = Math.sin(normalizedPos * Math.PI); // 0 at ends, 1 in middle
-            const segAlpha = stream.baseAlpha * (0.35 + taper * 0.65) * opacity;
+            const segAlpha = stream.baseAlpha * (0.28 + taper * 0.72) * opacity;
 
             if (segAlpha <= 0.002) continue;
 
             ctx.fillStyle = `rgba(255, 255, 255, ${segAlpha})`;
-            // Draw clean square/pixel wind dash
-            ctx.fillRect(currentX, segY, stream.blockSize, stream.blockSize);
+            ctx.fillRect(
+              pt.x - stream.blockSize / 2,
+              pt.y - stream.blockSize / 2,
+              stream.blockSize,
+              stream.blockSize
+            );
           }
         }
 
@@ -137,7 +198,7 @@ export default function PinkWindParticles({ opacity = 1 }) {
           if (p.x > width + 30) p.x = -15;
 
           const currentAlpha =
-            (p.baseAlpha + Math.sin(elapsed * p.pulseSpeed + p.phase) * 0.05) * opacity;
+            (p.baseAlpha + Math.sin(elapsed * p.pulseSpeed + p.phase) * 0.04) * opacity;
 
           if (currentAlpha <= 0.002) continue;
 
