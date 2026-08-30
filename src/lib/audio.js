@@ -1,8 +1,9 @@
 /**
  * Web Audio API & HTML5 Audio Hybrid Engine
  * - Main Track: "The Greenhouse Hour" (public/audio/bgm-main.mp3 or The_Greenhouse_Hour.mp3)
- * - Postcard Track: "Dept - Strawberry Champagne" (public/audio/bgm-postcard.mp3)
+ * - Postcard Track: "A Slow Turn of the Page" (public/audio/A_Slow_Turn_of_the_Page.mp3 or bgm-postcard.mp3)
  * - Automatic permanent switch to Postcard Track once Postcard is viewed
+ * - Smooth 1.75-second crossfade (plays second track first and fades in over 1.75s, fades out first track)
  * - Graceful fallback to Web Audio API synthesizer if MP3s fail to load
  * - Multiple SFX presets (pop, rustle, chime, flip, whoosh, sparkle)
  */
@@ -13,10 +14,14 @@ let isBgmPlaying = false;
 let currentTrack = 'main'; // 'main' | 'postcard'
 let hasSwitchedToPostcard = false;
 
+const BGM_TARGET_VOLUME = 0.65;
+export const FADE_DURATION_MS = 1750; // 1.75 seconds
+
 // HTML5 Audio instances for custom MP3s
 let mainAudioEl = null;
 let postcardAudioEl = null;
 let usingHtmlAudio = false;
+let activeFadeRaf = null;
 
 // Synthesizer variables
 let bgmIntervalId = null;
@@ -29,8 +34,8 @@ export const TRACK_INFO = {
     artist: 'Main Theme',
   },
   postcard: {
-    title: 'Dept - Strawberry Champagne',
-    artist: 'Dept',
+    title: 'A Slow Turn of the Page',
+    artist: 'Special Theme',
   },
 };
 
@@ -39,7 +44,7 @@ const NOTES = {
   C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
   C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
   C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, B5: 987.77,
-  C6: 1046.50
+  C6: 1046.50,
 };
 
 const MELODY_MAIN = [
@@ -129,14 +134,15 @@ const cleanBase = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
 
 const MP3_PATHS = {
   main: [
-    `${cleanBase}audio/bgm-main.mp3`,
     `${cleanBase}audio/The_Greenhouse_Hour.mp3`,
-    './audio/bgm-main.mp3',
+    `${cleanBase}audio/bgm-main.mp3`,
     './audio/The_Greenhouse_Hour.mp3',
+    './audio/bgm-main.mp3',
   ],
   postcard: [
+    `${cleanBase}audio/A_Slow_Turn_of_the_Page.mp3`,
     `${cleanBase}audio/bgm-postcard.mp3`,
-    `${cleanBase}audio/Dept-%20Strawberry%20Champagne%20Official%20lyrics%20video.mp3`,
+    './audio/A_Slow_Turn_of_the_Page.mp3',
     './audio/bgm-postcard.mp3',
   ],
 };
@@ -144,7 +150,7 @@ const MP3_PATHS = {
 function tryCreateAudioElement(paths) {
   const audio = new Audio();
   audio.loop = true;
-  audio.volume = 0.65;
+  audio.volume = BGM_TARGET_VOLUME;
   let pathIndex = 0;
 
   audio.src = paths[pathIndex];
@@ -162,8 +168,83 @@ try {
   postcardAudioEl = tryCreateAudioElement(MP3_PATHS.postcard);
 } catch (_) {}
 
+// ─── Fading Helpers ──────────────────────────────────────────────────────────
+function cancelActiveFade() {
+  if (activeFadeRaf) {
+    cancelAnimationFrame(activeFadeRaf);
+    activeFadeRaf = null;
+  }
+}
+
+/**
+ * Crossfades smoothly from fromAudio to toAudio over durationMs (1.75s).
+ * Starts toAudio immediately at volume 0 and ramps up to 0.65,
+ * while fromAudio simultaneously fades out from its current volume to 0.
+ */
+function crossFadeHtmlAudio(fromAudio, toAudio, durationMs = FADE_DURATION_MS) {
+  cancelActiveFade();
+
+  const fromEl = fromAudio;
+  const toEl = toAudio;
+
+  const isFromPlaying = fromEl && !fromEl.paused && fromEl.currentTime > 0;
+  const startFromVol = isFromPlaying ? fromEl.volume : 0;
+
+  if (toEl) {
+    toEl.volume = 0;
+    toEl.currentTime = 0;
+    if (!isMuted) {
+      const playPromise = toEl.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            usingHtmlAudio = true;
+            notifyListeners();
+          })
+          .catch(() => {
+            usingHtmlAudio = false;
+            startSynthBgm(currentTrack);
+          });
+      }
+    }
+  }
+
+  const startTime = performance.now();
+
+  function fadeStep(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / durationMs);
+
+    if (toEl && !isMuted) {
+      toEl.volume = progress * BGM_TARGET_VOLUME;
+    }
+
+    if (fromEl && isFromPlaying) {
+      fromEl.volume = Math.max(0, (1 - progress) * startFromVol);
+    }
+
+    if (progress < 1) {
+      activeFadeRaf = requestAnimationFrame(fadeStep);
+    } else {
+      activeFadeRaf = null;
+      if (toEl && !isMuted) {
+        toEl.volume = BGM_TARGET_VOLUME;
+      }
+      if (fromEl) {
+        try {
+          fromEl.pause();
+          fromEl.currentTime = 0;
+          fromEl.volume = BGM_TARGET_VOLUME;
+        } catch (_) {}
+      }
+    }
+  }
+
+  activeFadeRaf = requestAnimationFrame(fadeStep);
+}
+
 // ─── BGM Controls ─────────────────────────────────────────────────────────────
-export function startBgm(track = currentTrack) {
+export function startBgm(track = currentTrack, { fadeDuration = 0 } = {}) {
   initAudio();
   currentTrack = track;
   isBgmPlaying = true;
@@ -172,28 +253,35 @@ export function startBgm(track = currentTrack) {
   const targetAudio = track === 'postcard' ? postcardAudioEl : mainAudioEl;
   const otherAudio = track === 'postcard' ? mainAudioEl : postcardAudioEl;
 
-  if (otherAudio) {
-    try {
-      otherAudio.pause();
-      otherAudio.currentTime = 0;
-    } catch (_) {}
-  }
-
-  if (targetAudio && targetAudio.src && !isMuted) {
-    const playPromise = targetAudio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          usingHtmlAudio = true;
-          notifyListeners();
-        })
-        .catch(() => {
-          usingHtmlAudio = false;
-          startSynthBgm(track);
-        });
-    }
+  if (fadeDuration > 0 && targetAudio) {
+    crossFadeHtmlAudio(otherAudio, targetAudio, fadeDuration);
   } else {
-    startSynthBgm(track);
+    cancelActiveFade();
+    if (otherAudio) {
+      try {
+        otherAudio.pause();
+        otherAudio.currentTime = 0;
+        otherAudio.volume = BGM_TARGET_VOLUME;
+      } catch (_) {}
+    }
+
+    if (targetAudio && targetAudio.src && !isMuted) {
+      targetAudio.volume = BGM_TARGET_VOLUME;
+      const playPromise = targetAudio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            usingHtmlAudio = true;
+            notifyListeners();
+          })
+          .catch(() => {
+            usingHtmlAudio = false;
+            startSynthBgm(track);
+          });
+      }
+    } else {
+      startSynthBgm(track);
+    }
   }
   notifyListeners();
 }
@@ -224,6 +312,7 @@ function stopSynthBgm() {
 }
 
 export function stopBgm() {
+  cancelActiveFade();
   isBgmPlaying = false;
   stopSynthBgm();
   if (mainAudioEl) {
@@ -240,34 +329,31 @@ export function toggleBgm() {
     stopBgm();
     return false;
   } else {
-    startBgm(currentTrack);
+    startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
     return true;
   }
 }
 
 /**
- * Switch permanently to Postcard track ("Dept - Strawberry Champagne")
+ * Switch permanently to Postcard track ("A Slow Turn of the Page")
+ * Plays the second music immediately and fades it in over 1.75 seconds while fading out the first track.
  */
-export function triggerPostcardMusicPermanent() {
+export function triggerPostcardMusicPermanent(fadeDuration = FADE_DURATION_MS) {
   hasSwitchedToPostcard = true;
   currentTrack = 'postcard';
-  if (isBgmPlaying) {
-    startBgm('postcard');
-  } else {
-    // If BGM was off, auto-start the song when opening postcard for maximum emotion
-    startBgm('postcard');
-  }
+  isBgmPlaying = true;
+  startBgm('postcard', { fadeDuration });
   notifyListeners();
 }
 
-export function switchBgmTrack(trackName) {
+export function switchBgmTrack(trackName, fadeDuration = FADE_DURATION_MS) {
   if (hasSwitchedToPostcard && trackName === 'main') {
     // Keep postcard track active once discovered!
     return;
   }
   currentTrack = trackName;
   if (isBgmPlaying) {
-    startBgm(trackName);
+    startBgm(trackName, { fadeDuration });
   } else {
     notifyListeners();
   }

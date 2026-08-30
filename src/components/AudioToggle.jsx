@@ -52,7 +52,7 @@ export default function AudioToggle() {
 
       <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>
         {audioState.isBgmPlaying ? (
-          isPostcard ? '🎵 Dept - Strawberry Champagne' : '🎵 The Greenhouse Hour'
+          `🎵 ${audioState.trackInfo?.title || (isPostcard ? 'A Slow Turn of the Page' : 'The Greenhouse Hour')}`
         ) : (
           '🔇 Music: OFF'
         )}

@@ -145,7 +145,7 @@ export default function PostCardModal({ isOpen, onClose }) {
                       </div>
                       <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                         <Music2 size={12} color="#b388ff" />
-                        <span style={{ fontWeight: 600, color: '#7c4dff' }}>Dept - Strawberry Champagne 🍓🍾</span>
+                        <span style={{ fontWeight: 600, color: '#7c4dff' }}>A Slow Turn of the Page</span>
                       </div>
                     </div>
                   </div>
