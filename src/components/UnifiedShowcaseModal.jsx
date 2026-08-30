@@ -279,10 +279,10 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                           Thank you so much for bringing pure sunshine and laughter into my life every single day!
                         </p>
                         <p style={{ marginBottom: '8px' }}>
-                          May your birthday and every single day ahead be filled with smiles, sweet treats, and nonstop joy! 🎮🥳
+                          May your birthday and every single day ahead be filled with smiles, sweet treats, and nonstop joy!
                         </p>
                         <p style={{ textAlign: 'right', fontWeight: 700, color: '#ff6b8b', marginTop: '10px' }}>
-                          — Non 🐶💕
+                          — Non
                         </p>
                       </div>
 

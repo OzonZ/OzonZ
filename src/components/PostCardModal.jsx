@@ -190,11 +190,11 @@ export default function PostCardModal({ isOpen, onClose }) {
                   </p>
                   <p style={{ marginBottom: '12px' }}>
                     No matter what crazy adventure comes next, knowing you're around makes every single moment brighter and full of joy.
-                    May your birthday (and every day after) be filled with endless smiles, sweet treats, and victory streaks! 🎮🥳
+                    May your birthday (and every day after) be filled with endless smiles, sweet treats, and victory streaks!
                   </p>
                   <p style={{ textAlign: 'right', fontWeight: 700, color: 'var(--text-main)', marginTop: '16px' }}>
                     Forever your teammate & puppy,<br />
-                    <span style={{ color: '#ff6b8b', fontSize: '1.05rem', fontFamily: 'var(--font-head)' }}>— Non 🐶💕</span>
+                    <span style={{ color: '#ff6b8b', fontSize: '1.05rem', fontFamily: 'var(--font-head)' }}>— Non</span>
                   </p>
                 </div>
 
