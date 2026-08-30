@@ -1,7 +1,7 @@
 /**
- * WaveOverlay — smooth layered SVG sinusoidal waves rendered as a fixed fullscreen overlay.
- * Inspired by the layered wave silhouette aesthetic (purple/pink tones at low opacity).
- * Sits on top of the pastel background at ~8% opacity per wave so the original bg shows through.
+ * WaveOverlay — 4 smooth SVG sinusoidal wave layers that loop horizontally forever.
+ * Each SVG is 200% wide with the path tiled twice, then animated translateX(0→-50%)
+ * for a seamless infinite scroll effect.
  */
 export default function WaveOverlay() {
   return (
@@ -15,108 +15,117 @@ export default function WaveOverlay() {
         zIndex: 2,
       }}
     >
-      {/* Wave Layer 1 — lowest, widest crests */}
+      <style>{`
+        @keyframes waveLoop1 {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes waveLoop2 {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes waveLoop3 {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes waveLoop4 {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
+
+      {/* Wave Layer 1 — deepest, slowest */}
       <svg
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 2880 900"
+        preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
           position: 'absolute',
-          inset: 0,
-          width: '100%',
+          bottom: 0,
+          left: 0,
+          width: '200%',
           height: '100%',
-          opacity: 0.09,
-          animation: 'waveShift1 18s ease-in-out infinite alternate',
+          opacity: 0.1,
+          animation: 'waveLoop1 18s linear infinite',
         }}
       >
+        {/* Two seamlessly tiled periods */}
         <path
-          d="M0,520 C180,460 360,580 540,520 C720,460 900,580 1080,520 C1260,460 1350,490 1440,520 L1440,900 L0,900 Z"
+          d="M0,500 C180,430 360,570 540,500 C720,430 900,570 1080,500 C1260,430 1440,500 1440,500
+             C1620,430 1800,570 1980,500 C2160,430 2340,570 2520,500 C2700,430 2880,500 2880,500
+             L2880,900 L0,900 Z"
           fill="#b388ff"
         />
       </svg>
 
-      {/* Wave Layer 2 — mid layer */}
+      {/* Wave Layer 2 — mid height, opposite direction */}
       <svg
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 2880 900"
+        preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
           position: 'absolute',
-          inset: 0,
-          width: '100%',
+          bottom: 0,
+          left: 0,
+          width: '200%',
           height: '100%',
           opacity: 0.08,
-          animation: 'waveShift2 22s ease-in-out infinite alternate',
+          animation: 'waveLoop2 24s linear infinite reverse',
         }}
       >
         <path
-          d="M0,600 C200,540 400,660 600,600 C800,540 1000,660 1200,600 C1320,560 1380,580 1440,600 L1440,900 L0,900 Z"
+          d="M0,580 C240,510 480,650 720,580 C960,510 1200,650 1440,580
+             C1680,510 1920,650 2160,580 C2400,510 2640,620 2880,580
+             L2880,900 L0,900 Z"
           fill="#ff8da1"
         />
       </svg>
 
-      {/* Wave Layer 3 — higher up, narrower crests */}
+      {/* Wave Layer 3 — higher, faster */}
       <svg
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 2880 900"
+        preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
           position: 'absolute',
-          inset: 0,
-          width: '100%',
+          bottom: 0,
+          left: 0,
+          width: '200%',
           height: '100%',
-          opacity: 0.06,
-          animation: 'waveShift3 26s ease-in-out infinite alternate',
+          opacity: 0.07,
+          animation: 'waveLoop3 14s linear infinite',
         }}
       >
         <path
-          d="M0,680 C240,620 480,740 720,680 C960,620 1200,720 1440,660 L1440,900 L0,900 Z"
+          d="M0,650 C200,600 400,700 600,650 C800,600 1000,700 1200,650 C1400,600 1440,640 1440,650
+             C1640,600 1840,700 2040,650 C2240,600 2440,700 2640,650 C2780,615 2880,640 2880,650
+             L2880,900 L0,900 Z"
           fill="#7c4dff"
         />
       </svg>
 
-      {/* Wave Layer 4 — top foreground, lightest */}
+      {/* Wave Layer 4 — foreground, fastest, lightest */}
       <svg
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 2880 900"
+        preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
           position: 'absolute',
-          inset: 0,
-          width: '100%',
+          bottom: 0,
+          left: 0,
+          width: '200%',
           height: '100%',
-          opacity: 0.05,
-          animation: 'waveShift4 30s ease-in-out infinite alternate',
+          opacity: 0.06,
+          animation: 'waveLoop4 10s linear infinite reverse',
         }}
       >
         <path
-          d="M0,750 C160,710 320,790 480,750 C640,710 800,790 960,750 C1120,710 1280,760 1440,740 L1440,900 L0,900 Z"
+          d="M0,730 C160,700 320,760 480,730 C640,700 800,760 960,730 C1120,700 1280,750 1440,730
+             C1600,700 1760,760 1920,730 C2080,700 2240,760 2400,730 C2560,700 2720,750 2880,730
+             L2880,900 L0,900 Z"
           fill="#ffd1dc"
         />
       </svg>
-
-      <style>{`
-        @keyframes waveShift1 {
-          0%   { transform: translateX(0px) scaleY(1); }
-          50%  { transform: translateX(-40px) scaleY(1.04); }
-          100% { transform: translateX(30px) scaleY(0.97); }
-        }
-        @keyframes waveShift2 {
-          0%   { transform: translateX(0px) scaleY(1); }
-          50%  { transform: translateX(50px) scaleY(1.06); }
-          100% { transform: translateX(-30px) scaleY(0.96); }
-        }
-        @keyframes waveShift3 {
-          0%   { transform: translateX(0px) scaleY(1); }
-          50%  { transform: translateX(-60px) scaleY(1.03); }
-          100% { transform: translateX(40px) scaleY(0.98); }
-        }
-        @keyframes waveShift4 {
-          0%   { transform: translateX(0px) scaleY(1); }
-          50%  { transform: translateX(35px) scaleY(1.05); }
-          100% { transform: translateX(-25px) scaleY(0.97); }
-        }
-      `}</style>
     </div>
   );
 }
