@@ -42,57 +42,45 @@ body {
 }
 
 /* =============================================
-   ANIMATED MESH GRADIENT BACKGROUND
+   ANIMATED WAVE BACKGROUND
    ============================================= */
-.mesh-bg {
+.wave-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  border-radius: inherit;
 }
 
-.mesh-blob {
+.wave {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
+  width: 200vmax;
+  height: 200vmax;
   opacity: 0.55;
-  animation: blobFloat 8s ease-in-out infinite;
+  left: 50%;
+  top: 50%;
+  margin-left: -100vmax;
+  margin-top: -100vmax;
+  background: linear-gradient(744deg, #af40ff, #5b42f3 60%, #00ddeb);
+  border-radius: 40%;
+  animation: waveSpin 55s infinite linear;
+  transform-origin: center center;
 }
 
-.mesh-blob-1 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #ffa07a, transparent 70%);
-  top: -150px;
-  left: -100px;
-  animation-delay: 0s;
-  animation-duration: 9s;
+.wave:nth-child(2) {
+  opacity: 0.45;
+  animation-duration: 50s;
+  animation-direction: reverse;
 }
 
-.mesh-blob-2 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, #ff69b4, transparent 70%);
-  top: -200px;
-  right: -150px;
-  animation-delay: -3s;
-  animation-duration: 11s;
+.wave:nth-child(3) {
+  opacity: 0.38;
+  animation-duration: 45s;
 }
 
-.mesh-blob-3 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, #b388ff, transparent 70%);
-  bottom: -100px;
-  left: 30%;
-  animation-delay: -6s;
-  animation-duration: 13s;
-}
-
-@keyframes blobFloat {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.97); }
+@keyframes waveSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* =============================================
