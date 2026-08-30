@@ -2,7 +2,7 @@
  * Web Audio API & HTML5 Audio Hybrid Engine
  * - Main Track: "A Slow Turn of the Page" (public/audio/bgm-main.mp3 or A_Slow_Turn_of_the_Page.mp3)
  * - Postcard Track: "Dept - Strawberry Champagne" (public/audio/bgm-postcard.mp3 or Dept- Strawberry Champagne Official lyrics video.mp3)
- * - Always-on Autoplay on initial website load (with graceful unlock on first touch/scroll/click)
+ * - Always-on Autoplay on initial website load (with robust zero-lag unlock on first interaction)
  * - Automatic permanent switch to Postcard Track once Postcard is viewed
  * - Smooth 1.75-second crossfade (plays second track first and fades in over 1.75s, fades out first track)
  * - Graceful fallback to Web Audio API synthesizer if MP3s fail to load
@@ -187,7 +187,7 @@ function cancelActiveFade() {
 
 /**
  * Crossfades smoothly from fromAudio to toAudio over durationMs (1.75s).
- * Starts toAudio immediately at volume 0 and ramps up to 0.65,
+ * Starts toAudio immediately at volume 0 and ramps up to BGM_TARGET_VOLUME,
  * while fromAudio simultaneously fades out from its current volume to 0.
  */
 function crossFadeHtmlAudio(fromAudio, toAudio, durationMs = FADE_DURATION_MS) {
@@ -210,9 +210,11 @@ function crossFadeHtmlAudio(fromAudio, toAudio, durationMs = FADE_DURATION_MS) {
           notifyListeners();
         })
         .catch((err) => {
-          console.warn('Audio play error, using fallback:', err);
-          usingHtmlAudio = false;
-          startSynthBgm(currentTrack);
+          if (err && err.name !== 'NotAllowedError') {
+            console.warn('Audio play error, using fallback:', err);
+            usingHtmlAudio = false;
+            startSynthBgm(currentTrack);
+          }
         });
     }
   }
@@ -225,7 +227,7 @@ function crossFadeHtmlAudio(fromAudio, toAudio, durationMs = FADE_DURATION_MS) {
     const elapsed = now - startTime;
     const progress = Math.min(1, elapsed / durationMs);
 
-    // Target track fades in (0 -> 0.65)
+    // Target track fades in (0 -> BGM_TARGET_VOLUME)
     if (toEl && !isMuted) {
       toEl.volume = Math.min(BGM_TARGET_VOLUME, progress * BGM_TARGET_VOLUME);
     }
@@ -288,13 +290,13 @@ export function startBgm(track = currentTrack, { fadeDuration = 0 } = {}) {
             usingHtmlAudio = true;
             notifyListeners();
           })
-          .catch(() => {
-            usingHtmlAudio = false;
-            startSynthBgm(track);
+          .catch((err) => {
+            if (err && err.name !== 'NotAllowedError') {
+              usingHtmlAudio = false;
+              startSynthBgm(track);
+            }
           });
       }
-    } else {
-      startSynthBgm(track);
     }
   }
   notifyListeners();
@@ -340,12 +342,15 @@ export function stopBgm() {
 }
 
 export function toggleBgm() {
-  if (isBgmPlaying) {
+  const activeEl = currentTrack === 'postcard' ? postcardAudioEl : mainAudioEl;
+  const isActuallyPlaying = isBgmPlaying && activeEl && !activeEl.paused;
+
+  if (isActuallyPlaying) {
     stopBgm();
     return false;
   } else {
     userManuallyPaused = false;
-    startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
+    startBgm(currentTrack, { fadeDuration: 1000 });
     return true;
   }
 }
@@ -390,11 +395,7 @@ export function initAutoplay() {
   isBgmPlaying = true;
   notifyListeners();
 
-  // 1. Try immediate playback (works if browser allows or user visited before)
-  startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
-
-  // 2. Global gesture unlocker (triggers on first click, tap, or touch anywhere)
-  const unlockAudio = () => {
+  const tryPlayActive = () => {
     if (userManuallyPaused) return;
     initAudio();
     const activeEl = currentTrack === 'postcard' ? postcardAudioEl : mainAudioEl;
@@ -413,11 +414,25 @@ export function initAutoplay() {
     }
   };
 
-  if (typeof window !== 'undefined') {
-    const events = ['click', 'pointerdown', 'touchstart', 'touchend', 'keydown', 'scroll'];
+  // 1. Try immediate playback (plays directly if allowed)
+  tryPlayActive();
+
+  // 2. Global gesture unlocker (triggers on first click, tap, scroll, touch anywhere)
+  const onFirstGesture = () => {
+    if (userManuallyPaused) return;
+    tryPlayActive();
+    const events = ['click', 'pointerdown', 'touchstart', 'touchend', 'keydown', 'scroll', 'wheel'];
     events.forEach((evt) => {
-      window.addEventListener(evt, unlockAudio, { capture: true, passive: true, once: true });
-      document.addEventListener(evt, unlockAudio, { capture: true, passive: true, once: true });
+      window.removeEventListener(evt, onFirstGesture, true);
+      document.removeEventListener(evt, onFirstGesture, true);
+    });
+  };
+
+  if (typeof window !== 'undefined') {
+    const events = ['click', 'pointerdown', 'touchstart', 'touchend', 'keydown', 'scroll', 'wheel'];
+    events.forEach((evt) => {
+      window.addEventListener(evt, onFirstGesture, { capture: true, passive: true, once: true });
+      document.addEventListener(evt, onFirstGesture, { capture: true, passive: true, once: true });
     });
   }
 }
@@ -425,9 +440,9 @@ export function initAutoplay() {
 // Auto-trigger on script load if window is available
 if (typeof window !== 'undefined') {
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initAutoplay, 100);
+    setTimeout(initAutoplay, 50);
   } else {
-    window.addEventListener('DOMContentLoaded', () => setTimeout(initAutoplay, 100));
+    window.addEventListener('DOMContentLoaded', () => setTimeout(initAutoplay, 50));
   }
 }
 
