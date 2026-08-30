@@ -2,6 +2,7 @@
  * Web Audio API & HTML5 Audio Hybrid Engine
  * - Main Track: "A Slow Turn of the Page" (public/audio/A_Slow_Turn_of_the_Page.mp3 or bgm-main.mp3)
  * - Postcard Track: "Dept - Strawberry Champagne" (public/audio/Dept- Strawberry Champagne Official lyrics video.mp3 or bgm-postcard.mp3)
+ * - Always-on Autoplay on initial website load (with graceful unlock on first touch/scroll/click)
  * - Automatic permanent switch to Postcard Track once Postcard is viewed
  * - Smooth 1.75-second crossfade (plays second track first and fades in over 1.75s, fades out first track)
  * - Graceful fallback to Web Audio API synthesizer if MP3s fail to load
@@ -10,9 +11,11 @@
 
 let audioCtx = null;
 let isMuted = false;
-let isBgmPlaying = false;
+let isBgmPlaying = true; // Always ON by default when opening website
 let currentTrack = 'main'; // 'main' | 'postcard'
 let hasSwitchedToPostcard = false;
+let userManuallyPaused = false;
+let autoplayAttempted = false;
 
 const BGM_TARGET_VOLUME = 0.65;
 export const FADE_DURATION_MS = 1750; // 1.75 seconds
@@ -250,6 +253,7 @@ export function startBgm(track = currentTrack, { fadeDuration = 0 } = {}) {
   initAudio();
   currentTrack = track;
   isBgmPlaying = true;
+  userManuallyPaused = false;
   stopSynthBgm();
 
   const targetAudio = track === 'postcard' ? postcardAudioEl : mainAudioEl;
@@ -314,6 +318,7 @@ function stopSynthBgm() {
 }
 
 export function stopBgm() {
+  userManuallyPaused = true;
   cancelActiveFade();
   isBgmPlaying = false;
   stopSynthBgm();
@@ -331,6 +336,7 @@ export function toggleBgm() {
     stopBgm();
     return false;
   } else {
+    userManuallyPaused = false;
     startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
     return true;
   }
@@ -344,13 +350,13 @@ export function triggerPostcardMusicPermanent(fadeDuration = FADE_DURATION_MS) {
   hasSwitchedToPostcard = true;
   currentTrack = 'postcard';
   isBgmPlaying = true;
+  userManuallyPaused = false;
   startBgm('postcard', { fadeDuration });
   notifyListeners();
 }
 
 export function switchBgmTrack(trackName, fadeDuration = FADE_DURATION_MS) {
   if (hasSwitchedToPostcard && trackName === 'main') {
-    // Keep postcard track active once discovered!
     return;
   }
   currentTrack = trackName;
@@ -367,6 +373,43 @@ export function isBgmOn() {
 
 export function getCurrentTrack() {
   return currentTrack;
+}
+
+// ─── Autoplay Initialization on Website Open ─────────────────────────────────
+export function initAutoplay() {
+  if (userManuallyPaused) return;
+  autoplayAttempted = true;
+  isBgmPlaying = true;
+  notifyListeners();
+
+  // Try immediate playback
+  startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
+
+  // Add one-time user interaction listeners to unlock audio seamlessly if blocked by browser policy
+  const unlockAudio = () => {
+    if (userManuallyPaused) return;
+    initAudio();
+    const activeEl = currentTrack === 'postcard' ? postcardAudioEl : mainAudioEl;
+    if (!activeEl || activeEl.paused) {
+      startBgm(currentTrack, { fadeDuration: FADE_DURATION_MS });
+    }
+  };
+
+  if (typeof window !== 'undefined') {
+    const events = ['click', 'touchstart', 'pointerdown', 'scroll', 'wheel', 'keydown'];
+    events.forEach((evt) => {
+      window.addEventListener(evt, unlockAudio, { passive: true, once: true });
+    });
+  }
+}
+
+// Auto-trigger on script load if window is available
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initAutoplay, 150);
+  } else {
+    window.addEventListener('DOMContentLoaded', () => setTimeout(initAutoplay, 150));
+  }
 }
 
 // ─── SFX Presets ─────────────────────────────────────────────────────────────

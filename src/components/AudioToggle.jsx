@@ -5,7 +5,7 @@ import { toggleBgm, subscribeAudioState } from '../lib/audio';
 
 export default function AudioToggle() {
   const [audioState, setAudioState] = useState({
-    isBgmPlaying: false,
+    isBgmPlaying: true,
     currentTrack: 'main',
     isMuted: false,
     trackInfo: { title: 'A Slow Turn of the Page' },
