@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCw, Music2 } from 'lucide-react';
-import { switchBgmTrack, sfxRustle, sfxFlip, sfxSparkle } from '../lib/audio';
+import { triggerPostcardMusicPermanent, sfxRustle, sfxFlip, sfxSparkle } from '../lib/audio';
 
 export default function PostCardModal({ isOpen, onClose }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -10,11 +10,7 @@ export default function PostCardModal({ isOpen, onClose }) {
     if (isOpen) {
       sfxRustle();
       sfxSparkle();
-      // Switch to the Dept - Strawberry Champagne track
-      switchBgmTrack('postcard');
-    } else {
-      // Switch back to The Greenhouse Hour main track
-      switchBgmTrack('main');
+      triggerPostcardMusicPermanent(1750);
     }
   }, [isOpen]);
 

@@ -13,10 +13,10 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
   const [direction, setDirection] = useState(1);
   const [isPostcardFlipped, setIsPostcardFlipped] = useState(false);
 
-  // When step 1 (Postcard) is reached, permanently activate Strawberry Champagne song!
+  // When step 1 (Postcard) is reached, permanently activate Strawberry Champagne song with 1.75s crossfade!
   useEffect(() => {
     if (isOpen && currentStep === 1) {
-      triggerPostcardMusicPermanent();
+      triggerPostcardMusicPermanent(1750);
       sfxRustle();
       sfxSparkle();
     } else if (isOpen && currentStep === 4) {
@@ -30,7 +30,11 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
     if (currentStep < TOTAL_STEPS - 1) {
       sfxWhoosh();
       setDirection(1);
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      if (nextStep === 1) {
+        triggerPostcardMusicPermanent(1750);
+      }
+      setCurrentStep(nextStep);
     }
   };
 
@@ -38,18 +42,26 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
     if (currentStep > 0) {
       sfxWhoosh();
       setDirection(-1);
-      setCurrentStep(currentStep - 1);
+      const prevStep = currentStep - 1;
+      if (prevStep === 1) {
+        triggerPostcardMusicPermanent(1750);
+      }
+      setCurrentStep(prevStep);
     }
   };
 
   const handleStepSelect = (idx) => {
     sfxPop();
     setDirection(idx > currentStep ? 1 : -1);
+    if (idx === 1) {
+      triggerPostcardMusicPermanent(1750);
+    }
     setCurrentStep(idx);
   };
 
   const handleFlipPostcard = () => {
     sfxFlip();
+    triggerPostcardMusicPermanent(1750);
     setIsPostcardFlipped(!isPostcardFlipped);
   };
 
