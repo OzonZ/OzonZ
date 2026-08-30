@@ -242,11 +242,11 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                       >
                         <div>
                           <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, color: 'var(--primary-dark)', fontSize: '1.05rem' }}>
-                            💌 Secret Postcard
+                          Secret Postcard
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                             <Music2 size={12} color="#b388ff" />
-                            <span style={{ fontWeight: 700, color: '#7c4dff' }}>Dept - Strawberry Champagne 🍓🍾</span>
+                            <span style={{ fontWeight: 700, color: '#7c4dff' }}>Dept - Strawberry Champagne</span>
                           </div>
                         </div>
 
@@ -266,14 +266,14 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                             transform: 'rotate(6deg)',
                           }}
                         >
-                          <span style={{ fontSize: '18px' }}>🎂</span>
+                          <span style={{ fontSize: '18px' }}>&#x1F382;</span>
                           <span style={{ fontSize: '8px', fontWeight: 800, color: '#ffffff' }}>NON'S GIFT</span>
                         </div>
                       </div>
 
                       <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-main)', marginBottom: '16px' }}>
                         <p style={{ fontWeight: 700, color: '#ff6b8b', marginBottom: '6px' }}>
-                          Dear someone very special ✨,
+                          Dear someone very special,
                         </p>
                         <p style={{ marginBottom: '8px' }}>
                           Thank you so much for bringing pure sunshine and laughter into my life every single day!
@@ -305,7 +305,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         }}
                       >
                         <RotateCw size={13} />
-                        <span>Flip to Polaroid Photo 📸</span>
+                        <span>Flip to Polaroid Photo</span>
                       </button>
                     </div>
 
@@ -353,13 +353,13 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                             justifyContent: 'center',
                           }}
                         >
-                          <span style={{ fontSize: '36px' }}>🐶🎂💖</span>
+                          <span style={{ fontSize: '36px' }}>🐶</span>
                           <span style={{ fontSize: '10px', fontWeight: 700, color: '#ffffff', marginTop: '4px' }}>
                             Best Moments Together
                           </span>
                         </div>
                         <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.78rem', color: 'var(--text-main)' }}>
-                          "To infinity & beyond! ✨"
+                          "To infinity & beyond!"
                         </p>
                       </div>
 
@@ -470,7 +470,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                   />
 
                   <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
-                    <div style={{ fontSize: '2.8rem', marginBottom: '6px' }}>🎂✨🥳</div>
+                    <div style={{ fontSize: '2.8rem', marginBottom: '6px' }}>🎂</div>
                     <h2
                       style={{
                         fontFamily: 'var(--font-head)',
@@ -480,7 +480,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         marginBottom: '12px',
                       }}
                     >
-                      HAPPY BIRTHDAY! 💖
+                      HAPPY BIRTHDAY!
                     </h2>
                     <p
                       style={{
@@ -491,12 +491,12 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         marginBottom: '16px',
                       }}
                     >
-                      Wishing you the happiest, sweetest, most magical birthday ever! Whether this is advance, right on time, or belated — you deserve all the love, happiness, and wins in the world! 🎉
+                      Wishing you the happiest, sweetest, most magical birthday ever! Whether this is advance, right on time, or belated — you deserve all the love, happiness, and wins in the world!
                     </p>
 
                     {/* Stickers Row */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                      {['🎈 Best Wish', '🐾 Puppy Love', '🏆 Derp of Year', '🎮 RoV Carries'].map((tag) => (
+                      {['Best Wish', 'Puppy Love', 'Derp of Year', 'RoV Carries'].map((tag) => (
                         <span
                           key={tag}
                           style={{
@@ -516,7 +516,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                     </div>
 
                     <p style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      With all my love & loyalty, from Non 🐶💕
+                      With all my love & loyalty, from Non 🐶
                     </p>
                   </div>
                 </motion.div>
@@ -580,7 +580,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                   boxShadow: '0 4px 16px rgba(255, 107, 139, 0.4)',
                 }}
               >
-                <span>Thank You! 💖</span>
+                <span>Thank You!</span>
               </motion.button>
             ) : (
               <motion.button

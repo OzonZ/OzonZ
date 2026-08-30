@@ -53,7 +53,7 @@ export default function VoucherCard({ badge, title, description, terms, index = 
       {/* Body */}
       <div className="voucher-card-body">
         <p className="voucher-description">{description}</p>
-        <p className="voucher-terms">📋 {terms}</p>
+        <p className="voucher-terms">{terms}</p>
       </div>
     </motion.div>
   );

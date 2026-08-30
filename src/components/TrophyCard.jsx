@@ -63,7 +63,7 @@ export default function TrophyCard({ index = 3, onFlipped }) {
             }}
             onClick={handleClick}
           >
-            "Awarded to the ultimate goofball of the year... Hmm, I wonder who this could possibly belong to? 😏"
+            "Awarded to the ultimate goofball of the year... Hmm, I wonder who this could possibly belong to?"
             <div style={{
               marginTop: '10px',
               fontSize: '0.72rem',
@@ -118,7 +118,7 @@ export default function TrophyCard({ index = 3, onFlipped }) {
                 paddingBottom: '20px',
               }}
             >
-              <span className="voucher-badge">🏆 Special Collectible</span>
+              <span className="voucher-badge">Special Collectible</span>
               {/* Trophy illustration */}
               <div style={{
                 fontSize: '3.5rem',
@@ -184,7 +184,7 @@ export default function TrophyCard({ index = 3, onFlipped }) {
                 Can be redeemed individually across 10 separate gaming matches.
               </p>
               <p className="voucher-terms">
-                📋 Condition: Non has strictly 0% right of refusal — he MUST team up and carry every single time, no excuses allowed!
+                Condition: Non has strictly 0% right of refusal — he MUST team up and carry every single time, no excuses allowed!
               </p>
               <motion.div
                 style={{

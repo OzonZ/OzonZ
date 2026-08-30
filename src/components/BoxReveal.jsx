@@ -97,7 +97,7 @@ export default function BoxReveal({ onOpenBox, canOpen = false }) {
                 boxShadow: '0 6px 20px rgba(255, 107, 139, 0.35)',
               }}
             >
-              🎁 View Box Gifts Again
+              View Box Gifts Again
             </button>
           </motion.div>
         )}
