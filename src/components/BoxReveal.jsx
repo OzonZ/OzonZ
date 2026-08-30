@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GiftBox from './GiftBox';
-import RedEnvelope from './RedEnvelope';
 import { fullRevealBurst } from '../lib/confetti';
 import { sfxPop, sfxWhoosh, sfxChime, sfxSparkle } from '../lib/audio';
 
-export default function BoxReveal({ onOpenEnvelope, onOpenPostcard }) {
+export default function BoxReveal({ onOpenEnvelope, onOpenPostcard, canOpen = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showItems, setShowItems] = useState(false);
   const [clicked, setClicked] = useState(false);
@@ -45,23 +44,25 @@ export default function BoxReveal({ onOpenEnvelope, onOpenPostcard }) {
         zIndex: 20,
       }}
     >
-      {/* Gift Box Container */}
+      {/* 3D Mysterious Gift Box */}
       <motion.div
-        animate={{ scale: isOpen ? 1.08 : 1 }}
+        animate={{
+          scale: isOpen ? 1.08 : 1,
+        }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         style={{ position: 'relative', zIndex: 10 }}
       >
         <GiftBox wobble={!isOpen} isOpen={isOpen} scale={1.25} />
       </motion.div>
 
-      {/* CTA Button — Click to Open 🎁 */}
+      {/* CTA Button — Shows ONLY when user scrolls to the final destination */}
       <AnimatePresence>
-        {!isOpen && (
+        {canOpen && !isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 25, scale: 0.88 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
-            transition={{ duration: 0.4 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 20 }}
             style={{ marginTop: '36px', position: 'relative', zIndex: 15 }}
           >
             <button className="open-btn" onClick={handleOpen} id="open-gift-btn">

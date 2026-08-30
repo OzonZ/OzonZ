@@ -1,9 +1,9 @@
-import { useRef } from 'react';
-import { useScroll, useTransform, motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BoxReveal from './BoxReveal';
 
 // Ambient floating particles
-function AmbientParticle({ index, scrollYProgress }) {
+function AmbientParticle({ index, progress }) {
   const leftPct = 5 + (index * 13.7) % 90;
   const size = 5 + (index % 4) * 3;
   const duration = 6 + (index % 5) * 2;
@@ -12,16 +12,11 @@ function AmbientParticle({ index, scrollYProgress }) {
   const INITIAL_COLORS = ['#FFA07A', '#FF69B4', '#B388FF', '#FFD166', '#FF8DA1'];
   const FINAL_COLORS = ['rgba(255,255,255,0.95)', 'rgba(255,209,220,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,209,220,0.95)', 'rgba(255,255,255,0.85)'];
 
-  const color = useTransform(
-    scrollYProgress,
-    [0.1, 0.45],
-    [INITIAL_COLORS[index % 5], FINAL_COLORS[index % 5]]
-  );
-
-  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.3, 0.85, 0.85, 0.4]);
+  const color = progress > 0.3 ? FINAL_COLORS[index % 5] : INITIAL_COLORS[index % 5];
+  const opacity = Math.min(Math.max(progress * 1.5, 0.3), 0.85);
 
   return (
-    <motion.div
+    <div
       className="particle-dot"
       style={{
         position: 'absolute',
@@ -36,98 +31,98 @@ function AmbientParticle({ index, scrollYProgress }) {
         animationDelay: `${delay}s`,
         filter: 'blur(1px)',
         pointerEvents: 'none',
+        transition: 'background-color 0.6s ease',
       }}
     />
   );
 }
 
-// Speech Bubble with smooth scroll range transitions
-function SpeechBubbleCard({ text, side, scrollYProgress, enterRange, exitRange }) {
-  const opacity = useTransform(
-    scrollYProgress,
-    [enterRange, enterRange + 0.04, exitRange - 0.04, exitRange],
-    [0, 1, 1, 0]
-  );
-
-  const x = useTransform(
-    scrollYProgress,
-    [enterRange, enterRange + 0.04, exitRange - 0.04, exitRange],
-    side === 'left' ? [-30, 0, 0, -20] : [30, 0, 0, 20]
-  );
-
-  const scale = useTransform(
-    scrollYProgress,
-    [enterRange, enterRange + 0.04, exitRange - 0.04, exitRange],
-    [0.85, 1, 1, 0.9]
-  );
-
+// Speech Bubble with spring animation
+function SpeechBubbleCard({ text, side, visible }) {
   return (
-    <motion.div
-      style={{
-        opacity,
-        x,
-        scale,
-        position: 'absolute',
-        [side === 'left' ? 'right' : 'left']: 'calc(50% + 115px)',
-        top: '38%',
-        transform: 'translateY(-50%)',
-        zIndex: 25,
-        pointerEvents: 'none',
-      }}
-    >
-      <div className={`speech-bubble ${side === 'left' ? 'left' : 'right'}`}>
-        {text}
-      </div>
-    </motion.div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, x: side === 'left' ? -35 : 35, scale: 0.85 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: side === 'left' ? -20 : 20, scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+          style={{
+            position: 'absolute',
+            [side === 'left' ? 'right' : 'left']: 'calc(50% + 120px)',
+            top: '38%',
+            transform: 'translateY(-50%)',
+            zIndex: 25,
+            pointerEvents: 'none',
+          }}
+        >
+          <div className={`speech-bubble ${side === 'left' ? 'left' : 'right'}`}>
+            {text}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
-  const trackRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ['start start', 'end end'],
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const totalScroll = (document.documentElement.scrollHeight - window.innerHeight) || 1;
+      const currentProgress = Math.min(Math.max(scrollY / totalScroll, 0), 1);
+      setProgress(currentProgress);
+    };
 
-  // Global background color morph: Pure white -> Dreamy pastel pink
-  const bgColor = useTransform(
-    scrollYProgress,
-    [0, 0.22, 0.6, 1],
-    ['#ffffff', '#fff3f6', '#ffe8ef', '#ffebf0']
-  );
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Scene 01 (Hero Landing): Fades out cleanly as user scrolls down
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.16], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.16], [0, -70]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.16], [1, 0.94]);
-  const heroPointerEvents = useTransform(scrollYProgress, (v) => (v > 0.14 ? 'none' : 'auto'));
+  // Compute seamless background color based on progress (0 -> 1)
+  // #ffffff (255,255,255) -> #ffebf0 (255,235,240)
+  const g = Math.round(255 - progress * 20);
+  const b = Math.round(255 - progress * 15);
+  const bgColor = `rgb(255, ${g}, ${b})`;
 
-  // Scene 02 (Gift Box Centerpiece): Enters as Hero fades out
-  const boxOpacity = useTransform(scrollYProgress, [0.12, 0.22], [0, 1]);
-  const boxScale = useTransform(scrollYProgress, [0.15, 0.35, 0.65, 0.85], [0.8, 0.95, 1.08, 1.2]);
-  const boxY = useTransform(scrollYProgress, [0.12, 0.25], [60, 0]);
-  const boxPointerEvents = useTransform(scrollYProgress, (v) => (v < 0.15 ? 'none' : 'auto'));
+  // Scene 01 (Hero Landing): Fades out smoothly from progress 0 -> 0.16
+  const heroOpacity = Math.max(1 - progress / 0.16, 0);
+  const heroY = -progress * 250;
+  const heroScale = 1 - progress * 0.3;
+  const heroVisible = heroOpacity > 0.01;
 
-  // Scroll Hint Indicator
-  const hintOpacity = useTransform(scrollYProgress, [0, 0.08, 0.7, 0.85], [0.75, 0.45, 0.45, 0]);
+  // Scene 02 (Gift Box Centerpiece): Appears as you scroll down
+  const boxOpacity = Math.min(Math.max((progress - 0.06) / 0.12, 0), 1);
+  const boxScale = 0.85 + progress * 0.35;
+  const boxY = Math.max(40 - progress * 200, 0);
+  const canOpen = progress >= 0.65;
+
+  // Speech bubble active steps
+  const bubble1Active = progress >= 0.18 && progress < 0.36;
+  const bubble2Active = progress >= 0.36 && progress < 0.54;
+  const bubble3Active = progress >= 0.54 && progress < 0.72;
+
+  // Bottom scroll hint
+  const hintOpacity = progress < 0.7 ? Math.max(0.75 - progress, 0.35) : 0;
 
   return (
     <div
-      ref={trackRef}
       style={{
-        height: '320vh', // Generous smooth scroll length for 3 steps + final dock
+        height: '320vh', // 3.2 viewports for smooth scrolling
         position: 'relative',
       }}
     >
-      {/* ─── FIXED FULLSCREEN CANVAS (No seams, no cutoffs, perfect morph) ─── */}
-      <motion.div
+      {/* ─── FIXED FULLSCREEN CANVAS (No seams, perfect morph) ─────────── */}
+      <div
         style={{
           position: 'fixed',
           inset: 0,
           backgroundColor: bgColor,
           zIndex: 1,
           pointerEvents: 'none',
+          transition: 'background-color 0.1s linear',
         }}
       >
         {/* Animated Mesh Gradient Blobs */}
@@ -139,9 +134,9 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
 
         {/* Ambient Floating Sparkle Particles */}
         {Array.from({ length: 16 }, (_, idx) => (
-          <AmbientParticle key={idx} index={idx} scrollYProgress={scrollYProgress} />
+          <AmbientParticle key={idx} index={idx} progress={progress} />
         ))}
-      </motion.div>
+      </div>
 
       {/* ─── FIXED INTERACTIVE VIEWPORT SCENE ───────────────────────────── */}
       <div
@@ -158,146 +153,145 @@ export default function ScrollJourney({ onOpenEnvelope, onOpenPostcard }) {
         }}
       >
         {/* ─── SCENE 01: HERO ENTRY (Fades to none on scroll) ─────────── */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 24px',
-            textAlign: 'center',
-            opacity: heroOpacity,
-            y: heroY,
-            scale: heroScale,
-            pointerEvents: heroPointerEvents,
-            zIndex: 15,
-          }}
-        >
-          <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-            <div style={{ fontSize: '4rem', marginBottom: '16px' }}>✨</div>
-            <h1
-              style={{
-                fontFamily: 'var(--font-head)',
-                fontWeight: 700,
-                fontSize: 'clamp(1.8rem, 5vw, 3rem)',
-                color: 'var(--text-main)',
-                lineHeight: 1.25,
-                marginBottom: '16px',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Hello! You are someone{' '}
-              <span className="gradient-text">truly special</span>{' '}
-              to Non.
-            </h1>
-            <p
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                color: 'var(--text-muted)',
-                lineHeight: 1.7,
-                marginBottom: '36px',
-                maxWidth: '520px',
-                margin: '0 auto 36px',
-              }}
-            >
-              He created this secret corner of the web just for you to find
-              what's waiting down below.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <p style={{ fontFamily: 'var(--font-head)', fontWeight: 600, color: 'var(--primary)', fontSize: '1rem' }}>
-                Try scrolling down to see... Good luck! ✨
-              </p>
-              <div
-                className="bounce-arrow"
+        {heroVisible && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 24px',
+              textAlign: 'center',
+              opacity: heroOpacity,
+              transform: `translateY(${heroY}px) scale(${heroScale})`,
+              pointerEvents: heroOpacity > 0.2 ? 'auto' : 'none',
+              zIndex: 15,
+              transition: 'opacity 0.05s linear',
+            }}
+          >
+            <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+              <div style={{ fontSize: '4rem', marginBottom: '16px' }}>✨</div>
+              <h1
                 style={{
-                  width: '44px',
-                  height: '44px',
-                  background: 'linear-gradient(135deg, #ff8da1, #ff6b8b)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 6px 20px rgba(255, 141, 161, 0.4)',
-                  color: '#fff',
-                  fontSize: '20px',
-                  cursor: 'pointer',
-                  pointerEvents: 'auto',
-                }}
-                onClick={() => {
-                  window.scrollTo({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+                  fontFamily: 'var(--font-head)',
+                  fontWeight: 700,
+                  fontSize: 'clamp(1.8rem, 5vw, 3rem)',
+                  color: 'var(--text-main)',
+                  lineHeight: 1.25,
+                  marginBottom: '16px',
+                  letterSpacing: '-0.01em',
                 }}
               >
-                ↓
+                Hello! You are someone{' '}
+                <span className="gradient-text">truly special</span>{' '}
+                to Non.
+              </h1>
+              <p
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  marginBottom: '36px',
+                  maxWidth: '520px',
+                  margin: '0 auto 36px',
+                }}
+              >
+                He created this secret corner of the web just for you to find
+                what's waiting down below.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                <p style={{ fontFamily: 'var(--font-head)', fontWeight: 600, color: 'var(--primary)', fontSize: '1rem' }}>
+                  Try scrolling down to see... Good luck! ✨
+                </p>
+                <div
+                  className="bounce-arrow"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    background: 'linear-gradient(135deg, #ff8da1, #ff6b8b)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 6px 20px rgba(255, 141, 161, 0.4)',
+                    color: '#fff',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                  }}
+                  onClick={() => {
+                    window.scrollTo({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+                  }}
+                >
+                  ↓
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        )}
 
         {/* ─── SCENE 02: SCROLL-DRIVEN SPEECH BUBBLES ───────────────────── */}
         <SpeechBubbleCard
           text='"Oh look, a surprise gift box!"'
           side="left"
-          scrollYProgress={scrollYProgress}
-          enterRange={0.22}
-          exitRange={0.38}
+          visible={bubble1Active}
         />
         <SpeechBubbleCard
           text='"So exciting!"'
           side="right"
-          scrollYProgress={scrollYProgress}
-          enterRange={0.42}
-          exitRange={0.58}
+          visible={bubble2Active}
         />
         <SpeechBubbleCard
           text='"I wonder what could be inside...?"'
           side="left"
-          scrollYProgress={scrollYProgress}
-          enterRange={0.62}
-          exitRange={0.78}
+          visible={bubble3Active}
         />
 
         {/* ─── SCENE 02 & 03: CLAYMORPHIC GIFT BOX & DISCOVERY ─────────── */}
-        <motion.div
+        <div
           style={{
             opacity: boxOpacity,
-            scale: boxScale,
-            y: boxY,
+            transform: `translateY(${boxY}px) scale(${boxScale})`,
             zIndex: 20,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            pointerEvents: boxPointerEvents,
+            pointerEvents: boxOpacity > 0.2 ? 'auto' : 'none',
+            transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
           }}
         >
           <BoxReveal
             onOpenEnvelope={onOpenEnvelope}
             onOpenPostcard={onOpenPostcard}
+            canOpen={canOpen}
           />
-        </motion.div>
+        </div>
 
         {/* Dynamic bottom scroll indicator */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            opacity: hintOpacity,
-            fontFamily: 'var(--font-head)',
-            fontSize: '0.82rem',
-            color: 'var(--text-muted)',
-            fontWeight: 700,
-            letterSpacing: '0.05em',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            zIndex: 30,
-          }}
-        >
-          Scroll down to discover... 🎁
-        </motion.div>
+        {hintOpacity > 0.01 && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              opacity: hintOpacity,
+              fontFamily: 'var(--font-head)',
+              fontSize: '0.82rem',
+              color: 'var(--text-muted)',
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              textAlign: 'center',
+              pointerEvents: 'none',
+              zIndex: 30,
+            }}
+          >
+            Scroll down to discover... 🎁
+          </div>
+        )}
       </div>
     </div>
   );
