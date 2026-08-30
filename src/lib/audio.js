@@ -1,7 +1,7 @@
 /**
  * Web Audio API & HTML5 Audio Hybrid Engine
- * - Main Track: "The Greenhouse Hour" (public/audio/bgm-main.mp3 or The_Greenhouse_Hour.mp3)
- * - Postcard Track: "A Slow Turn of the Page" (public/audio/A_Slow_Turn_of_the_Page.mp3 or bgm-postcard.mp3)
+ * - Main Track: "A Slow Turn of the Page" (public/audio/A_Slow_Turn_of_the_Page.mp3 or bgm-main.mp3)
+ * - Postcard Track: "Dept - Strawberry Champagne" (public/audio/Dept- Strawberry Champagne Official lyrics video.mp3 or bgm-postcard.mp3)
  * - Automatic permanent switch to Postcard Track once Postcard is viewed
  * - Smooth 1.75-second crossfade (plays second track first and fades in over 1.75s, fades out first track)
  * - Graceful fallback to Web Audio API synthesizer if MP3s fail to load
@@ -30,12 +30,12 @@ let bgmStep = 0;
 // Track Information for UI
 export const TRACK_INFO = {
   main: {
-    title: 'The Greenhouse Hour',
-    artist: 'Main Theme',
+    title: 'A Slow Turn of the Page',
+    artist: 'Until Then OST',
   },
   postcard: {
-    title: 'A Slow Turn of the Page',
-    artist: 'Special Theme',
+    title: 'Dept - Strawberry Champagne',
+    artist: 'Dept',
   },
 };
 
@@ -134,15 +134,17 @@ const cleanBase = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
 
 const MP3_PATHS = {
   main: [
-    `${cleanBase}audio/The_Greenhouse_Hour.mp3`,
+    `${cleanBase}audio/A_Slow_Turn_of_the_Page.mp3`,
     `${cleanBase}audio/bgm-main.mp3`,
-    './audio/The_Greenhouse_Hour.mp3',
+    './audio/A_Slow_Turn_of_the_Page.mp3',
     './audio/bgm-main.mp3',
   ],
   postcard: [
-    `${cleanBase}audio/A_Slow_Turn_of_the_Page.mp3`,
+    `${cleanBase}audio/Dept-%20Strawberry%20Champagne%20Official%20lyrics%20video.mp3`,
+    `${cleanBase}audio/Dept- Strawberry Champagne Official lyrics video.mp3`,
     `${cleanBase}audio/bgm-postcard.mp3`,
-    './audio/A_Slow_Turn_of_the_Page.mp3',
+    './audio/Dept-%20Strawberry%20Champagne%20Official%20lyrics%20video.mp3',
+    './audio/Dept- Strawberry Champagne Official lyrics video.mp3',
     './audio/bgm-postcard.mp3',
   ],
 };
@@ -335,7 +337,7 @@ export function toggleBgm() {
 }
 
 /**
- * Switch permanently to Postcard track ("A Slow Turn of the Page")
+ * Switch permanently to Postcard track ("Dept - Strawberry Champagne")
  * Plays the second music immediately and fades it in over 1.75 seconds while fading out the first track.
  */
 export function triggerPostcardMusicPermanent(fadeDuration = FADE_DURATION_MS) {

@@ -8,7 +8,7 @@ export default function AudioToggle() {
     isBgmPlaying: false,
     currentTrack: 'main',
     isMuted: false,
-    trackInfo: { title: 'The Greenhouse Hour' },
+    trackInfo: { title: 'A Slow Turn of the Page' },
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function AudioToggle() {
 
       <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>
         {audioState.isBgmPlaying ? (
-          `🎵 ${audioState.trackInfo?.title || (isPostcard ? 'A Slow Turn of the Page' : 'The Greenhouse Hour')}`
+          `🎵 ${audioState.trackInfo?.title || (isPostcard ? 'Dept - Strawberry Champagne' : 'A Slow Turn of the Page')}`
         ) : (
           '🔇 Music: OFF'
         )}
