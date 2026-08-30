@@ -1,42 +1,3 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import BoxReveal from './BoxReveal';
-
-// Ambient floating particles
-function AmbientParticle({ index, progress }) {
-  const leftPct = 5 + (index * 13.7) % 90;
-  const size = 5 + (index % 4) * 3;
-  const duration = 6 + (index % 5) * 2;
-  const delay = (index % 6) * -1.5;
-
-  const INITIAL_COLORS = ['#FFA07A', '#FF69B4', '#B388FF', '#FFD166', '#FF8DA1'];
-  const FINAL_COLORS = ['rgba(255,255,255,0.95)', 'rgba(255,209,220,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,209,220,0.95)', 'rgba(255,255,255,0.85)'];
-
-  const color = progress > 0.35 ? FINAL_COLORS[index % 5] : INITIAL_COLORS[index % 5];
-  const opacity = Math.min(Math.max(progress * 1.5, 0.3), 0.85);
-
-  return (
-    <div
-      className="particle-dot"
-      style={{
-        position: 'absolute',
-        bottom: '-20px',
-        left: `${leftPct}%`,
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: '50%',
-        backgroundColor: color,
-        opacity,
-        animationDuration: `${duration}s`,
-        animationDelay: `${delay}s`,
-        filter: 'blur(1px)',
-        pointerEvents: 'none',
-        transition: 'background-color 0.6s ease',
-      }}
-    />
-  );
-}
-
 // Speech Bubble with spring animation
 function SpeechBubbleCard({ text, side, visible }) {
   return (
@@ -125,17 +86,12 @@ export default function ScrollJourney({ onOpenBox }) {
           transition: 'background-color 0.1s linear',
         }}
       >
-        {/* Animated Mesh Gradient Blobs */}
-        <div className="mesh-bg">
-          <div className="mesh-blob mesh-blob-1" />
-          <div className="mesh-blob mesh-blob-2" />
-          <div className="mesh-blob mesh-blob-3" />
+        {/* Animated Wave Background */}
+        <div className="wave-bg">
+          <div className="wave" />
+          <div className="wave" />
+          <div className="wave" />
         </div>
-
-        {/* Ambient Floating Sparkle Particles */}
-        {Array.from({ length: 16 }, (_, idx) => (
-          <AmbientParticle key={idx} index={idx} progress={progress} />
-        ))}
       </div>
 
       {/* ─── FIXED INTERACTIVE VIEWPORT SCENE ───────────────────────────── */}
@@ -171,7 +127,7 @@ export default function ScrollJourney({ onOpenBox }) {
             }}
           >
             <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '16px' }}>✨</div>
+              <div style={{ fontSize: '4rem', marginBottom: '16px' }}></div>
               <h1
                 style={{
                   fontFamily: 'var(--font-head)',
@@ -202,7 +158,7 @@ export default function ScrollJourney({ onOpenBox }) {
                 what's waiting down below.
               </p>
               <p style={{ fontFamily: 'var(--font-head)', fontWeight: 600, color: 'var(--primary)', fontSize: '1rem' }}>
-                Try scrolling down to see... Good luck! ✨
+                Try scrolling down to see... Good luck!
               </p>
             </div>
           </div>
@@ -263,7 +219,7 @@ export default function ScrollJourney({ onOpenBox }) {
               zIndex: 30,
             }}
           >
-            Scroll down to discover... 🎁
+            Scroll down to discover...
           </div>
         )}
       </div>
