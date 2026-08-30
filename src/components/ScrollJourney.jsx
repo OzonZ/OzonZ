@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BoxReveal from './BoxReveal';
+import WaveOverlay from './WaveOverlay';
 
 // Speech Bubble with spring animation
 function SpeechBubbleCard({ text, side, visible }) {
@@ -97,12 +98,8 @@ export default function ScrollJourney({ onOpenBox }) {
           <div className="mesh-blob mesh-blob-3" />
         </div>
 
-        {/* Subtle Wave Overlay — 5% opacity for a fancy shimmer */}
-        <div className="wave-bg">
-          <div className="wave" />
-          <div className="wave" />
-          <div className="wave" />
-        </div>
+        {/* Subtle SVG Sinusoidal Wave Overlay */}
+        <WaveOverlay />
       </div>
 
       {/* ─── FIXED INTERACTIVE VIEWPORT SCENE ───────────────────────────── */}
