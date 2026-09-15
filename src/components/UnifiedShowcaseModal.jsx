@@ -5,6 +5,7 @@ import VoucherCard from './VoucherCard';
 import TrophyCard from './TrophyCard';
 import { triggerPostcardMusicPermanent, sfxPop, sfxWhoosh, sfxChime, sfxSparkle, sfxRustle, sfxFlip } from '../lib/audio';
 import { finaleConfetti } from '../lib/confetti';
+import { showTicketToast } from './TicketToast';
 
 const TOTAL_STEPS = 5;
 
@@ -13,13 +14,30 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
   const [direction, setDirection] = useState(1);
   const [isPostcardFlipped, setIsPostcardFlipped] = useState(false);
 
-  // When step 1 (Postcard) is reached, permanently activate Strawberry Champagne song with 1.75s crossfade!
+  // Trigger ticket notifications & sound effects for each step
   useEffect(() => {
-    if (isOpen && currentStep === 1) {
+    if (!isOpen) return;
+
+    if (currentStep === 0) {
+      showTicketToast({
+        title: 'ได้รับตั๋วใหม่แล้ว! ✨',
+        subtitle: '⚡ Instant Non-Summon Pass',
+      });
+    } else if (currentStep === 1) {
       triggerPostcardMusicPermanent(1750);
       sfxRustle();
       sfxSparkle();
-    } else if (isOpen && currentStep === 4) {
+    } else if (currentStep === 2) {
+      showTicketToast({
+        title: 'ได้รับตั๋วใหม่แล้ว! ✨',
+        subtitle: "🐶 1-Minute 'Bark Bark' Pass",
+      });
+    } else if (currentStep === 3) {
+      showTicketToast({
+        title: 'ได้รับตั๋วรางวัลพิเศษ! 🏆',
+        subtitle: '24-Hour Venting & RoV Carry',
+      });
+    } else if (currentStep === 4) {
       // Step 5: HBD celebration confetti!
       sfxChime();
       setTimeout(finaleConfetti, 300);
@@ -345,33 +363,42 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         style={{
                           background: '#ffffff',
                           padding: '10px 10px 18px',
-                          borderRadius: '10px',
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                          borderRadius: '12px',
+                          boxShadow: '0 10px 28px rgba(0,0,0,0.14)',
                           border: '1px solid #f0e6eb',
                           transform: 'rotate(-2deg)',
-                          maxWidth: '220px',
+                          maxWidth: '240px',
+                          width: '100%',
                           marginBottom: '14px',
                         }}
                       >
                         <div
                           style={{
-                            width: '200px',
-                            height: '130px',
-                            background: 'linear-gradient(135deg, #ffd1dc, #ffebf0, #b388ff)',
-                            borderRadius: '6px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            width: '100%',
+                            height: '148px',
+                            background: '#111111',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.25)',
                           }}
                         >
-                          <span style={{ fontSize: '36px' }}>🐶</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#ffffff', marginTop: '4px' }}>
-                            Best Moments Together
-                          </span>
+                          <video
+                            src={`${import.meta.env.BASE_URL}video.mp4`}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              display: 'block',
+                            }}
+                          />
                         </div>
-                        <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.78rem', color: 'var(--text-main)' }}>
-                          "To infinity & beyond!"
+                        <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)' }}>
+                          "Best Moments Together ✨"
                         </p>
                       </div>
 

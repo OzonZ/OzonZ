@@ -288,23 +288,29 @@ export default function PostCardModal({ isOpen, onClose }) {
                     style={{
                       width: '230px',
                       height: '160px',
-                      background: 'linear-gradient(135deg, #ffd1dc, #ffebf0, #b388ff)',
+                      background: '#111111',
                       borderRadius: '8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'relative',
                       overflow: 'hidden',
+                      position: 'relative',
+                      boxShadow: 'inset 0 0 12px rgba(0,0,0,0.25)',
                     }}
                   >
-                    <span style={{ fontSize: '42px', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.15))' }}>🐶🎂💖</span>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff', marginTop: '6px', background: 'rgba(0,0,0,0.15)', padding: '2px 8px', borderRadius: '999px' }}>
-                      Best Moments Together
-                    </span>
+                    <video
+                      src={`${import.meta.env.BASE_URL}video.mp4`}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
                   </div>
                   <p style={{ marginTop: '12px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>
-                    "To infinity & beyond! ✨"
+                    "Best Moments Together ✨"
                   </p>
                 </motion.div>
 
