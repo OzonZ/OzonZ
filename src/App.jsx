@@ -4,6 +4,7 @@ import './index.css';
 import AudioToggle from './components/AudioToggle';
 import ScrollJourney from './components/ScrollJourney';
 import UnifiedShowcaseModal from './components/UnifiedShowcaseModal';
+import TicketToast from './components/TicketToast';
 import { logVisit } from './lib/firebase';
 import { initAutoplay } from './lib/audio';
 
@@ -37,6 +38,9 @@ export default function App() {
         isOpen={showShowcaseModal}
         onClose={handleCloseModal}
       />
+
+      {/* ─── Bottom-Right Ticket Notification Toast ────────────────────── */}
+      <TicketToast />
     </main>
   );
 }
