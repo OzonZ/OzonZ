@@ -363,70 +363,70 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                       }}
                     >
                       {/* Polaroid Frames Container - Fanned Layout */}
-                      <div style={{ position: 'relative', width: '100%', height: '260px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px', marginTop: '8px' }}>
+                      <div style={{ position: 'relative', width: '100%', height: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', marginTop: '16px' }}>
                         
                         <div style={{ position: 'relative', width: 0, height: 0 }}>
                           
                           {/* Trip Together (Left) */}
                           <motion.div
-                            initial={{ x: '-50%', y: '-50%', rotate: -12, marginLeft: -75, marginTop: 15 }}
-                            whileHover={{ scale: 1.15, rotate: -5, zIndex: 10, marginTop: -5 }}
+                            initial={{ x: '-50%', y: '-50%', rotate: -12, marginLeft: -105, marginTop: 25 }}
+                            whileHover={{ scale: 1.1, rotate: -5, zIndex: 10, marginTop: 5 }}
                             style={{
                               position: 'absolute',
                               zIndex: 1,
                               background: '#ffffff',
-                              padding: '8px 8px 14px',
-                              borderRadius: '8px',
-                              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                              padding: '10px 10px 18px',
+                              borderRadius: '10px',
+                              boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                               border: '1px solid #f0e6eb',
-                              width: '140px',
+                              width: '190px',
                             }}
                           >
-                            <img src={tripImg} alt="Trip together" style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '6px' }} />
-                            <p style={{ marginTop: '6px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-main)', textAlign: 'center' }}>"Trip together ✨"</p>
+                            <img src={tripImg} alt="Trip together" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }} />
+                            <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>"Trip together ✨"</p>
                           </motion.div>
 
                           {/* Drawing Together (Right) */}
                           <motion.div
-                            initial={{ x: '-50%', y: '-50%', rotate: 12, marginLeft: 75, marginTop: 15 }}
-                            whileHover={{ scale: 1.15, rotate: 5, zIndex: 10, marginTop: -5 }}
+                            initial={{ x: '-50%', y: '-50%', rotate: 12, marginLeft: 105, marginTop: 25 }}
+                            whileHover={{ scale: 1.1, rotate: 5, zIndex: 10, marginTop: 5 }}
                             style={{
                               position: 'absolute',
                               zIndex: 2,
                               background: '#ffffff',
-                              padding: '8px 8px 14px',
-                              borderRadius: '8px',
-                              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                              padding: '10px 10px 18px',
+                              borderRadius: '10px',
+                              boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                               border: '1px solid #f0e6eb',
-                              width: '140px',
+                              width: '190px',
                             }}
                           >
-                            <div style={{ display: 'flex', gap: '4px', height: '100px', borderRadius: '6px', overflow: 'hidden' }}>
+                            <div style={{ display: 'flex', gap: '4px', height: '140px', borderRadius: '8px', overflow: 'hidden' }}>
                               <img src={drawImg1} alt="Drawing 1" style={{ width: '50%', height: '100%', objectFit: 'cover' }} />
                               <img src={drawImg2} alt="Drawing 2" style={{ width: '50%', height: '100%', objectFit: 'cover' }} />
                             </div>
-                            <p style={{ marginTop: '6px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-main)', textAlign: 'center' }}>"Drawing together ✨"</p>
+                            <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>"Drawing together ✨"</p>
                           </motion.div>
 
                           {/* Video (Center) */}
                           <motion.div
-                            initial={{ x: '-50%', y: '-50%', rotate: -2, marginTop: -15 }}
-                            whileHover={{ scale: 1.15, rotate: 0, zIndex: 10, marginTop: -25 }}
+                            initial={{ x: '-50%', y: '-50%', rotate: -2, marginTop: -20 }}
+                            whileHover={{ scale: 1.1, rotate: 0, zIndex: 10, marginTop: -35 }}
                             style={{
                               position: 'absolute',
                               zIndex: 3,
                               background: '#ffffff',
-                              padding: '10px 10px 16px',
-                              borderRadius: '10px',
-                              boxShadow: '0 12px 30px rgba(0,0,0,0.18)',
+                              padding: '12px 12px 20px',
+                              borderRadius: '12px',
+                              boxShadow: '0 16px 40px rgba(0,0,0,0.2)',
                               border: '1px solid #f0e6eb',
-                              width: '180px',
+                              width: '240px',
                             }}
                           >
-                            <div style={{ width: '100%', height: '130px', background: '#111111', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
+                            <div style={{ width: '100%', height: '170px', background: '#111111', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
                               <video src={memoryVideo} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             </div>
-                            <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>"Best Moments ✨"</p>
+                            <p style={{ marginTop: '10px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)', textAlign: 'center' }}>"Best Moments ✨"</p>
                           </motion.div>
 
                         </div>
