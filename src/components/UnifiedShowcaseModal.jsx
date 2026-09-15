@@ -363,9 +363,9 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                       }}
                     >
                       {/* Polaroid Frames Container - Fanned Layout */}
-                      <div style={{ position: 'relative', width: '100%', height: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', marginTop: '16px' }}>
+                      <div style={{ position: 'relative', width: '100%', height: 'var(--fan-height, 340px)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', marginTop: '16px' }}>
                         
-                        <div style={{ position: 'relative', width: 0, height: 0 }}>
+                        <div style={{ position: 'relative', width: 0, height: 0, transform: 'scale(var(--fan-scale, 1))' }}>
                           
                           {/* Trip Together (Left) */}
                           <motion.div

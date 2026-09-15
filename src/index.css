@@ -19,6 +19,15 @@
   --card-surface: rgba(255, 255, 255, 0.85);
   --font-head: 'Quicksand', 'Nunito', sans-serif;
   --font-body: 'Nunito', 'Quicksand', sans-serif;
+  --fan-scale: 1;
+  --fan-height: 340px;
+}
+
+@media (max-width: 450px) {
+  :root {
+    --fan-scale: 0.70;
+    --fan-height: 240px;
+  }
 }
 
 /* =============================================
@@ -163,6 +172,7 @@ body {
   color: var(--text-main);
   font-size: 0.9rem;
   max-width: 200px;
+  min-width: 130px;
   text-align: center;
   white-space: normal;
   word-break: break-word;

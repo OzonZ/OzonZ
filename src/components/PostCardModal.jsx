@@ -275,9 +275,9 @@ export default function PostCardModal({ isOpen, onClose }) {
                 />
 
                 {/* Polaroid Frames Container - Fanned Layout */}
-                <div style={{ position: 'relative', width: '100%', height: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', marginTop: '16px' }}>
+                <div style={{ position: 'relative', width: '100%', height: 'var(--fan-height, 340px)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', marginTop: '16px' }}>
                   
-                  <div style={{ position: 'relative', width: 0, height: 0 }}>
+                  <div style={{ position: 'relative', width: 0, height: 0, transform: 'scale(var(--fan-scale, 1))' }}>
                     
                     {/* Trip Together (Left) */}
                     <motion.div
@@ -358,12 +358,14 @@ export default function PostCardModal({ isOpen, onClose }) {
                     padding: '8px 24px',
                     fontFamily: 'var(--font-head)',
                     fontWeight: 700,
-                    fontSize: '0.85rem',
+                    fontSize: '0.9rem',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    gap: '8px',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(179, 136, 255, 0.4)',
+                    boxShadow: '0 4px 12px rgba(255, 141, 161, 0.3)',
+                    position: 'relative',
+                    zIndex: 50,
                   }}
                 >
                   <RotateCw size={14} />
