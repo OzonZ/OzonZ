@@ -181,15 +181,16 @@ export default function FinaleModal({ isOpen, onClose }) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.0 }}
                 style={{
-                  textAlign: 'center',
+                  textAlign: 'right',
                   marginTop: '16px',
                   fontFamily: 'var(--font-head)',
                   fontWeight: 600,
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   color: 'var(--text-muted)',
+                  paddingRight: '4px',
                 }}
               >
-                With love, from Non 🐶💕
+                from Non 🐶
               </motion.p>
             </motion.div>
           </motion.div>
