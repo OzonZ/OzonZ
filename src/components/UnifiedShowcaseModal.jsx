@@ -447,6 +447,8 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                           alignItems: 'center',
                           gap: '6px',
                           cursor: 'pointer',
+                          position: 'relative',
+                          zIndex: 50,
                         }}
                       >
                         <RotateCw size={13} />
