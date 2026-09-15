@@ -527,8 +527,18 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                       ))}
                     </div>
 
-                    <p style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      With all my love & loyalty, from Non 🐶
+                    <p
+                      style={{
+                        textAlign: 'right',
+                        fontFamily: 'var(--font-head)',
+                        fontWeight: 700,
+                        fontSize: '0.92rem',
+                        color: 'var(--text-muted)',
+                        marginTop: '16px',
+                        paddingRight: '4px',
+                      }}
+                    >
+                      from Non 🐶
                     </p>
                   </div>
                 </motion.div>
