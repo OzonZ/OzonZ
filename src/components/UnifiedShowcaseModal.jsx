@@ -7,6 +7,9 @@ import { triggerPostcardMusicPermanent, sfxPop, sfxWhoosh, sfxChime, sfxSparkle,
 import { finaleConfetti } from '../lib/confetti';
 import { showTicketToast } from './TicketToast';
 import memoryVideo from '../assets/video.mp4';
+import tripImg from '../assets/trip_together.jpg';
+import drawImg1 from '../assets/drawing_together_1.png';
+import drawImg2 from '../assets/drawing_together_2.png';
 
 const TOTAL_STEPS = 5;
 
@@ -356,51 +359,119 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
+                        overflowY: 'auto',
                       }}
                     >
-                      <div
-                        style={{
-                          background: '#ffffff',
-                          padding: '10px 10px 18px',
-                          borderRadius: '12px',
-                          boxShadow: '0 10px 28px rgba(0,0,0,0.14)',
-                          border: '1px solid #f0e6eb',
-                          transform: 'rotate(-2deg)',
-                          maxWidth: '240px',
-                          width: '100%',
-                          marginBottom: '14px',
-                        }}
-                      >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '20px', width: '100%', alignItems: 'center', paddingTop: '10px', paddingBottom: '10px' }}>
+                        {/* Video */}
                         <div
                           style={{
+                            background: '#ffffff',
+                            padding: '10px 10px 18px',
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 28px rgba(0,0,0,0.14)',
+                            border: '1px solid #f0e6eb',
+                            transform: 'rotate(-2deg)',
+                            maxWidth: '240px',
                             width: '100%',
-                            height: '148px',
-                            background: '#111111',
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                            position: 'relative',
-                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.25)',
                           }}
                         >
-                          <video
-                            src={memoryVideo}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
+                          <div
                             style={{
                               width: '100%',
-                              height: '100%',
+                              height: '148px',
+                              background: '#111111',
+                              borderRadius: '8px',
+                              overflow: 'hidden',
+                              position: 'relative',
+                              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.25)',
+                            }}
+                          >
+                            <video
+                              src={memoryVideo}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
+                              }}
+                            />
+                          </div>
+                          <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                            "Best Moments Together ✨"
+                          </p>
+                        </div>
+
+                        {/* Trip Together */}
+                        <div
+                          style={{
+                            background: '#ffffff',
+                            padding: '10px 10px 18px',
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 28px rgba(0,0,0,0.14)',
+                            border: '1px solid #f0e6eb',
+                            transform: 'rotate(3deg)',
+                            maxWidth: '240px',
+                            width: '100%',
+                          }}
+                        >
+                          <img
+                            src={tripImg}
+                            alt="Trip together"
+                            style={{
+                              width: '100%',
+                              height: '148px',
                               objectFit: 'cover',
-                              display: 'block',
+                              borderRadius: '8px',
+                              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.25)',
                             }}
                           />
+                          <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                            "Trip together ✨"
+                          </p>
                         </div>
-                        <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)' }}>
-                          "Best Moments Together ✨"
-                        </p>
+
+                        {/* Drawing Together */}
+                        <div
+                          style={{
+                            background: '#ffffff',
+                            padding: '10px 10px 18px',
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 28px rgba(0,0,0,0.14)',
+                            border: '1px solid #f0e6eb',
+                            transform: 'rotate(-1deg)',
+                            maxWidth: '240px',
+                            width: '100%',
+                          }}
+                        >
+                          <div style={{ display: 'flex', gap: '4px', height: '148px', borderRadius: '8px', overflow: 'hidden', boxShadow: 'inset 0 0 10px rgba(0,0,0,0.25)' }}>
+                            <img
+                              src={drawImg1}
+                              alt="Drawing 1"
+                              style={{
+                                width: '50%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                            />
+                            <img
+                              src={drawImg2}
+                              alt="Drawing 2"
+                              style={{
+                                width: '50%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          </div>
+                          <p style={{ marginTop: '8px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                            "Drawing together ✨"
+                          </p>
+                        </div>
                       </div>
 
                       <button
