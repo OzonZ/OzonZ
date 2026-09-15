@@ -158,6 +158,20 @@ body {
 /* =============================================
    SPEECH BUBBLES
    ============================================= */
+.speech-wrapper {
+  position: absolute;
+  top: 38%;
+  transform: translateY(-50%);
+  z-index: 25;
+  pointer-events: none;
+}
+.speech-wrapper.left {
+  right: calc(50% + 120px);
+}
+.speech-wrapper.right {
+  left: calc(50% + 120px);
+}
+
 .speech-bubble {
   position: relative;
   background: rgba(255, 255, 255, 0.85);
@@ -177,6 +191,35 @@ body {
   white-space: normal;
   word-break: break-word;
   line-height: 1.4;
+}
+
+@media (max-width: 550px) {
+  .speech-wrapper.left,
+  .speech-wrapper.right {
+    top: 18%;
+    left: 50%;
+    right: auto;
+    margin-left: -100px;
+  }
+  .speech-bubble {
+    width: 200px;
+    max-width: 85vw;
+  }
+  .speech-bubble.left::after,
+  .speech-bubble.right::after {
+    display: none; /* Hide the side arrows on mobile */
+  }
+  
+  /* Add a bottom arrow for the mobile speech bubble */
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.85);
+  }
 }
 
 .speech-bubble.left::after {

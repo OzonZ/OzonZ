@@ -14,14 +14,7 @@ function SpeechBubbleCard({ text, side, visible }) {
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: side === 'left' ? -20 : 20, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-          style={{
-            position: 'absolute',
-            [side === 'left' ? 'right' : 'left']: 'calc(50% + 120px)',
-            top: '38%',
-            transform: 'translateY(-50%)',
-            zIndex: 25,
-            pointerEvents: 'none',
-          }}
+          className={`speech-wrapper ${side}`}
         >
           <div className={`speech-bubble ${side === 'left' ? 'left' : 'right'}`}>
             {text}
