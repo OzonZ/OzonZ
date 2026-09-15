@@ -21,7 +21,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
 
     if (currentStep === 0) {
       showTicketToast({
-        title: 'ได้รับตั๋วใหม่แล้ว! ✨',
+        title: 'New Pass Unlocked',
         subtitle: '⚡ Instant Non-Summon Pass',
       });
     } else if (currentStep === 1) {
@@ -30,13 +30,13 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
       sfxSparkle();
     } else if (currentStep === 2) {
       showTicketToast({
-        title: 'ได้รับตั๋วใหม่แล้ว! ✨',
+        title: 'New Pass Unlocked',
         subtitle: "🐶 1-Minute 'Bark Bark' Pass",
       });
     } else if (currentStep === 3) {
       showTicketToast({
-        title: 'ได้รับตั๋วรางวัลพิเศษ! 🏆',
-        subtitle: '24-Hour Venting & RoV Carry',
+        title: 'Special Award Unlocked',
+        subtitle: '🏆 24-Hour Venting & RoV Carry',
       });
     } else if (currentStep === 4) {
       // Step 5: HBD celebration confetti!
