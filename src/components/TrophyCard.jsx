@@ -228,33 +228,7 @@ export default function TrophyCard({ index = 3, onFlipped }) {
         </motion.div>
       </div>
 
-      {/* Explicit Flip Button */}
-      <button
-        type="button"
-        onClick={handleFlip}
-        style={{
-          background: isFlipped
-            ? 'linear-gradient(135deg, #f4a261, #ffd166)'
-            : 'linear-gradient(135deg, #6c63ff, #b388ff)',
-          border: 'none',
-          color: '#ffffff',
-          borderRadius: '999px',
-          padding: '8px 20px',
-          fontFamily: 'var(--font-head)',
-          fontWeight: 700,
-          fontSize: '0.82rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '6px',
-          cursor: 'pointer',
-          margin: '14px auto 0',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
-        }}
-      >
-        <RotateCw size={13} />
-        <span>{isFlipped ? 'Flip Back to Trophy' : 'Flip to RoV Carry Coupon'}</span>
-      </button>
+
     </motion.div>
   );
 }
