@@ -242,7 +242,7 @@ export default function TicketToast() {
                   width: '100%',
                 }}
               >
-                {toast.title || 'ได้รับตั๋วใหม่แล้ว!'}
+                {toast.title || 'New Pass Unlocked'}
               </span>
               <span
                 style={{
@@ -257,7 +257,7 @@ export default function TicketToast() {
                   width: '100%',
                 }}
               >
-                {toast.subtitle || 'คุณได้รับสิทธิ์พิเศษ'}
+                {toast.subtitle || 'Special pass unlocked'}
               </span>
             </motion.div>
 
