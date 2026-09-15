@@ -6,6 +6,7 @@ import TrophyCard from './TrophyCard';
 import { triggerPostcardMusicPermanent, sfxPop, sfxWhoosh, sfxChime, sfxSparkle, sfxRustle, sfxFlip } from '../lib/audio';
 import { finaleConfetti } from '../lib/confetti';
 import { showTicketToast } from './TicketToast';
+import memoryVideo from '../assets/video.mp4';
 
 const TOTAL_STEPS = 5;
 
@@ -384,7 +385,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                           }}
                         >
                           <video
-                            src={`${import.meta.env.BASE_URL}video.mp4`}
+                            src={memoryVideo}
                             autoPlay
                             loop
                             muted

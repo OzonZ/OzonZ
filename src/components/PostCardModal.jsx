@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCw, Music2 } from 'lucide-react';
 import { triggerPostcardMusicPermanent, sfxRustle, sfxFlip, sfxSparkle } from '../lib/audio';
+import memoryVideo from '../assets/video.mp4';
 
 export default function PostCardModal({ isOpen, onClose }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -296,7 +297,7 @@ export default function PostCardModal({ isOpen, onClose }) {
                     }}
                   >
                     <video
-                      src={`${import.meta.env.BASE_URL}video.mp4`}
+                      src={memoryVideo}
                       autoPlay
                       loop
                       muted
