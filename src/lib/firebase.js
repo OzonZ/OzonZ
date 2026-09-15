@@ -20,8 +20,19 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+let app = null;
+let db = null;
+
+if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('placeholder')) {
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+  } catch (err) {
+    console.warn('Firebase init skipped or failed:', err.message);
+  }
+}
+
+export { db };
 
 // ── Visit logging ─────────────────────────────────────────────────────────────
 /**
@@ -29,6 +40,7 @@ export const db = getFirestore(app);
  * Called once on page load.
  */
 export async function logVisit() {
+  if (!db) return;
   try {
     await addDoc(collection(db, 'visits'), {
       timestamp: serverTimestamp(),
@@ -52,6 +64,7 @@ const REDEMPTION_DOC_ID = 'voucher-state';
  * Returns an object: { pass_01: true/false, pass_02: number, ... }
  */
 export async function getRedemptions() {
+  if (!db) return {};
   try {
     const ref = doc(db, 'redemptions', REDEMPTION_DOC_ID);
     const snap = await getDoc(ref);
@@ -69,6 +82,7 @@ export async function getRedemptions() {
  * @param {any} value - true for used, or remaining count
  */
 export async function redeemVoucher(voucherId, value) {
+  if (!db) return;
   try {
     const ref = doc(db, 'redemptions', REDEMPTION_DOC_ID);
     await setDoc(ref, {
