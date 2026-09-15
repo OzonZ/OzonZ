@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCw, Music2 } from 'lucide-react';
 import { triggerPostcardMusicPermanent, sfxRustle, sfxFlip, sfxSparkle } from '../lib/audio';
 import memoryVideo from '../assets/video.mp4';
+import tripImg from '../assets/trip_together.jpg';
+import drawImg1 from '../assets/drawing_together_1.png';
+import drawImg2 from '../assets/drawing_together_2.png';
 
 export default function PostCardModal({ isOpen, onClose }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -271,49 +274,124 @@ export default function PostCardModal({ isOpen, onClose }) {
                   }}
                 />
 
-                {/* Polaroid Frame */}
-                <motion.div
-                  whileHover={{ scale: 1.04, rotate: 0 }}
-                  style={{
-                    background: '#ffffff',
-                    padding: '14px 14px 24px',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
-                    border: '1px solid #f0e6eb',
-                    transform: 'rotate(-3deg)',
-                    maxWidth: '260px',
-                    marginBottom: '18px',
-                  }}
-                >
-                  <div
+                {/* Polaroid Frames Container */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '16px', width: '100%', alignItems: 'center', overflowY: 'auto', paddingTop: '10px', paddingBottom: '10px', flexGrow: 1 }}>
+                  {/* Video */}
+                  <motion.div
+                    whileHover={{ scale: 1.04, rotate: 0 }}
                     style={{
-                      width: '230px',
-                      height: '160px',
-                      background: '#111111',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      boxShadow: 'inset 0 0 12px rgba(0,0,0,0.25)',
+                      background: '#ffffff',
+                      padding: '14px 14px 24px',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                      border: '1px solid #f0e6eb',
+                      transform: 'rotate(-3deg)',
+                      maxWidth: '260px',
+                      width: '100%',
+                      flexShrink: 0,
                     }}
                   >
-                    <video
-                      src={memoryVideo}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
+                    <div
                       style={{
                         width: '100%',
-                        height: '100%',
+                        height: '160px',
+                        background: '#111111',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        boxShadow: 'inset 0 0 12px rgba(0,0,0,0.25)',
+                      }}
+                    >
+                      <video
+                        src={memoryVideo}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
+                    <p style={{ marginTop: '12px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                      "Best Moments Together ✨"
+                    </p>
+                  </motion.div>
+
+                  {/* Trip Together */}
+                  <motion.div
+                    whileHover={{ scale: 1.04, rotate: 0 }}
+                    style={{
+                      background: '#ffffff',
+                      padding: '14px 14px 24px',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                      border: '1px solid #f0e6eb',
+                      transform: 'rotate(2deg)',
+                      maxWidth: '260px',
+                      width: '100%',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={tripImg}
+                      alt="Trip together"
+                      style={{
+                        width: '100%',
+                        height: '160px',
                         objectFit: 'cover',
-                        display: 'block',
+                        borderRadius: '8px',
+                        boxShadow: 'inset 0 0 12px rgba(0,0,0,0.25)',
                       }}
                     />
-                  </div>
-                  <p style={{ marginTop: '12px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>
-                    "Best Moments Together ✨"
-                  </p>
-                </motion.div>
+                    <p style={{ marginTop: '12px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                      "Trip together ✨"
+                    </p>
+                  </motion.div>
+
+                  {/* Drawing Together */}
+                  <motion.div
+                    whileHover={{ scale: 1.04, rotate: 0 }}
+                    style={{
+                      background: '#ffffff',
+                      padding: '14px 14px 24px',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                      border: '1px solid #f0e6eb',
+                      transform: 'rotate(-1deg)',
+                      maxWidth: '260px',
+                      width: '100%',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div style={{ display: 'flex', gap: '4px', height: '160px', borderRadius: '8px', overflow: 'hidden', boxShadow: 'inset 0 0 12px rgba(0,0,0,0.25)' }}>
+                      <img
+                        src={drawImg1}
+                        alt="Drawing 1"
+                        style={{
+                          width: '50%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                      <img
+                        src={drawImg2}
+                        alt="Drawing 2"
+                        style={{
+                          width: '50%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    </div>
+                    <p style={{ marginTop: '12px', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)', textAlign: 'center' }}>
+                      "Drawing together ✨"
+                    </p>
+                  </motion.div>
+                </div>
 
                 <p style={{ fontFamily: 'var(--font-head)', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
                   Tap below to flip back to the message 💌
