@@ -538,7 +538,7 @@ export default function UnifiedShowcaseModal({ isOpen, onClose }) {
                         paddingRight: '4px',
                       }}
                     >
-                      from Non 🐶
+                      from Non
                     </p>
                   </div>
                 </motion.div>

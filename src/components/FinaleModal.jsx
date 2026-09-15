@@ -190,7 +190,7 @@ export default function FinaleModal({ isOpen, onClose }) {
                   paddingRight: '4px',
                 }}
               >
-                from Non 🐶
+                from Non
               </motion.p>
             </motion.div>
           </motion.div>
